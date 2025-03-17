@@ -3,10 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -32,7 +35,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Assert\NotBlank(groups: ['create'])]
+    #[Assert\Length(min: 8, minMessage: 'Le mot de passe doit contenir au moins 8 caractères')]
     private ?string $password = null;
+
+    #[ORM\Column]
+    #[Assert\NotBlank(groups: ['create'])]
+    #[Assert\EqualTo(propertyPath: "password", message: "Les mots de passe ne correspondent pas.")]
+    private ?string $password_ = null;
 
     #[ORM\Column(length: 255)]
     private ?string $nom = null;
@@ -54,6 +64,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?bool $isOnline = null;
+
+    /**
+     * @var Collection<int, Poles>
+     */
+    #[ORM\ManyToMany(targetEntity: Poles::class, mappedBy: 'personnel')]
+    private Collection $poles;
+
+    /**
+     * @var Collection<int, Services>
+     */
+    #[ORM\OneToMany(targetEntity: Services::class, mappedBy: 'responsable')]
+    private Collection $services;
+
+
+    public function __construct()
+    {
+        $this->poles = new ArrayCollection();
+        $this->services = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -90,8 +119,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
+        // guarantee every user at least has ROLE_LIGAIR
+        $roles[] = 'ROLE_LIGAIR';
 
         return array_unique($roles);
     }
@@ -114,12 +143,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
+    public function getPassword_(): ?string
+    {
+        return $this->password;
+    }
+
     public function setPassword(string $password): static
     {
         $this->password = $password;
 
         return $this;
     }
+
+    // // Confirmation du mot de passe
+    // public function getPassword_(): ?string
+    // {
+    //     return $this->password;
+    // }
+
+    // public function setPassword_(string $password): static
+    // {
+    //     $this->password = $password;
+
+    //     return $this;
+    // }
 
     /**
      * @see UserInterface
@@ -193,5 +240,62 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __toString(): string
     {
         return $this->prenom . ' ' . strtoupper($this->nom);
+    }
+
+    /**
+     * @return Collection<int, Poles>
+     */
+    public function getPoles(): Collection
+    {
+        return $this->poles;
+    }
+
+    public function addPole(Poles $pole): static
+    {
+        if (!$this->poles->contains($pole)) {
+            $this->poles->add($pole);
+            $pole->addPersonnel($this);
+        }
+
+        return $this;
+    }
+
+    public function removePole(Poles $pole): static
+    {
+        if ($this->poles->removeElement($pole)) {
+            $pole->removePersonnel($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Services>
+     */
+    public function getServices(): Collection
+    {
+        return $this->services;
+    }
+
+    public function addService(Services $service): static
+    {
+        if (!$this->services->contains($service)) {
+            $this->services->add($service);
+            $service->setResponsable($this);
+        }
+
+        return $this;
+    }
+
+    public function removeService(Services $service): static
+    {
+        if ($this->services->removeElement($service)) {
+            // set the owning side to null (unless already changed)
+            if ($service->getResponsable() === $this) {
+                $service->setResponsable(null);
+            }
+        }
+
+        return $this;
     }
 }

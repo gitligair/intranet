@@ -3,17 +3,27 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserCrudController extends AbstractCrudController
 {
+
+    public function __construct(private UserPasswordHasherInterface $passwordHasher)
+    {
+        $this->passwordHasher = $passwordHasher;
+    }
     public static function getEntityFqcn(): string
     {
         return User::class;
@@ -38,10 +48,67 @@ class UserCrudController extends AbstractCrudController
             TextField::new('prenom'),
             TextField::new('nom'),
             EmailField::new('email'),
+            TextField::new('password', 'mot de passe')->setFormType(PasswordType::class)->onlyOnForms(),
+            TextField::new('password_', 'Confirmer le mot de passe')
+                ->setFormType(PasswordType::class)
+                ->setRequired($pageName === Crud::PAGE_NEW || $pageName === Crud::PAGE_EDIT)
+                ->setHelp('Veuillez retaper le même mot de passe.'), // 🚨 Ce champ ne sera pas stocké en base de données !
+            ChoiceField::new('roles', 'Rôles')
+                ->setChoices([
+                    'Stagiaire' => 'ROLE_STAGIAIRE',
+                    'Utilisateur' => 'ROLE_LIGAIR',
+                    'Administrateur' => 'ROLE_ADMIN',
+                    'Super Admin' => 'ROLE_SUPER_ADMIN',
+                ])
+                ->allowMultipleChoices(),
+            // ->renderExpanded(), // Affiche des cases à cocher
             SlugField::new('identifiant')->setTargetFieldName(['prenom', 'nom'])->onlyOnForms(),
             TextField::new('identifiant')->hideOnForm(),
-            TextField::new('password', 'mot de passe')->setFormattedValue(PasswordType::class)->onlyOnForms(),
-            TextField::new('password_', "Re-tapez le mot de passe")->setFormattedValue(PasswordType::class)->onlyOnForms(),
+
         ];
+    }
+
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        if (!$entityInstance instanceof User) {
+            return;
+        }
+
+        // Récupérer le mot de passe du formulaire (qui n'est pas stocké en base)
+        $confirmPassword = $this->getContext()->getRequest()->get('password_');
+
+        dd($confirmPassword, $entityInstance->getPassword());
+
+        if ($entityInstance->getPassword() !== $confirmPassword) {
+            throw new \RuntimeException('Les mots de passe ne correspondent pas.');
+        }
+
+        if ($entityInstance->getPassword()) {
+            $hashedPassword = $this->passwordHasher->hashPassword($entityInstance, $entityInstance->getPassword());
+            $entityInstance->setPassword($hashedPassword);
+        }
+
+        parent::persistEntity($entityManager, $entityInstance);
+    }
+
+    public function updatetEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        if (!$entityInstance instanceof User) {
+            return;
+        }
+
+        // Récupérer le mot de passe du formulaire (qui n'est pas stocké en base)
+        $confirmPassword = $this->getContext()->getRequest()->get('confirmPassword');
+
+        if ($entityInstance->getPassword() !== $confirmPassword) {
+            throw new \RuntimeException('Les mots de passe ne correspondent pas.');
+        }
+
+        if ($entityInstance->getPassword()) {
+            $hashedPassword = $this->passwordHasher->hashPassword($entityInstance, $entityInstance->getPassword());
+            $entityInstance->setPassword($hashedPassword);
+        }
+
+        parent::persistEntity($entityManager, $entityInstance);
     }
 }

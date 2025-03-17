@@ -2,7 +2,9 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Processus;
 use App\Entity\User;
+use App\Entity\Services;
 use Symfony\Component\HttpFoundation\Response;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
@@ -29,7 +31,15 @@ class AdministrationController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToDashboard('Accueil', 'fa fa-home');
-        yield MenuItem::linkToCrud('Utilisateurs', 'fas fa-user', User::class);
+        return [
+            MenuItem::linkToDashboard('Dashboard', 'fa fa-home'),
+
+            MenuItem::section('Systeme qualité'),
+            MenuItem::linkToCrud('Processus', 'fa-solid fa-microchip', Processus::class),
+            MenuItem::linkToCrud('Services', 'fa fa-file-text', Services::class),
+
+            MenuItem::section('Utilisateurs..'),
+            MenuItem::linkToCrud('LIGAIR tous', 'fa fa-user', User::class),
+        ];
     }
 }
