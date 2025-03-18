@@ -2,25 +2,35 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Services;
 use App\Form\PolesType;
+use App\Entity\Services;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
-use phpDocumentor\Reflection\Types\Boolean;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 
 class ServicesCrudController extends AbstractCrudController
 {
+
     public static function getEntityFqcn(): string
     {
         return Services::class;
     }
 
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            // ...
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->add(Crud::PAGE_EDIT, Action::SAVE_AND_ADD_ANOTHER)
+        ;
+    }
 
     public function configureFields(string $pageName): iterable
     {
@@ -29,15 +39,16 @@ class ServicesCrudController extends AbstractCrudController
             TextField::new('nom', 'Nom du service'),
             SlugField::new('identifiant')->setTargetFieldName('nom')->onlyOnForms(),
             AssociationField::new('responsable', 'Responsable du service'),
-            CollectionField::new('poles_service', 'Poles')
-                ->setEntryType(PolesType::class) // Utilisation du formulaire PoleType
+            AssociationField::new('poles_service', 'Poles')
                 ->setFormTypeOptions([
-                    'by_reference' => false,
-                    'allow_add' => true,
-                    'allow_delete' => true,
-                ])
-                ->renderExpanded(),
-            AssociationField::new('processus', 'Processus'),
+                    'by_reference' => true, // Important pour les relations ManyToMany
+                    'multiple' => true,
+                ]),
+            AssociationField::new('processus', 'Processus')
+                ->setFormTypeOptions([
+                    'by_reference' => true, // Important pour les relations ManyToMany
+                    'multiple' => true,
+                ]),
             BooleanField::new('isOnline', 'En ligne'),
         ];
     }

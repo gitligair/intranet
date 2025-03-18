@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Poles;
 use App\Entity\Processus;
 use App\Entity\User;
 use App\Entity\Services;
@@ -37,6 +38,7 @@ class AdministrationController extends AbstractDashboardController
             MenuItem::section('Systeme qualité'),
             MenuItem::linkToCrud('Processus', 'fa-solid fa-microchip', Processus::class),
             MenuItem::linkToCrud('Services', 'fa fa-file-text', Services::class),
+            MenuItem::linkToCrud('Pôles Service', 'fa fa-file-text', Poles::class),
 
             MenuItem::section('Utilisateurs..'),
             MenuItem::linkToCrud('LIGAIR tous', 'fa fa-user', User::class),

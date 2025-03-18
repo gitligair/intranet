@@ -33,7 +33,7 @@ class Processus
     /**
      * @var Collection<int, Services>
      */
-    #[ORM\OneToMany(targetEntity: Services::class, mappedBy: 'processus')]
+    #[ORM\ManyToMany(targetEntity: Services::class, mappedBy: 'processus')]
     private Collection $services;
 
     /**
@@ -113,7 +113,7 @@ class Processus
     {
         if (!$this->services->contains($service)) {
             $this->services->add($service);
-            $service->setProcessus($this);
+            $service->addProcessus($this);
         }
 
         return $this;
@@ -124,7 +124,7 @@ class Processus
         if ($this->services->removeElement($service)) {
             // set the owning side to null (unless already changed)
             if ($service->getProcessus() === $this) {
-                $service->setProcessus(null);
+                $service->removeProcessus($this);
             }
         }
 

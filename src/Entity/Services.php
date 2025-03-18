@@ -33,11 +33,11 @@ class Services
     /**
      * @var Collection<int, Poles>
      */
-    #[ORM\OneToMany(targetEntity: Poles::class, mappedBy: 'services', cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Poles::class, mappedBy: 'services', cascade: ['persist', 'remove'])]
     private Collection $poles_service;
 
-    #[ORM\ManyToOne(inversedBy: 'services')]
-    private ?Processus $processus = null;
+    #[ORM\ManyToMany(targetEntity: Processus::class, inversedBy: 'services')]
+    private ?Collection $processus = null;
 
     #[ORM\ManyToOne(inversedBy: 'services')]
     private ?User $responsable = null;
@@ -45,6 +45,7 @@ class Services
     public function __construct()
     {
         $this->poles_service = new ArrayCollection();
+        $this->processus = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -60,6 +61,13 @@ class Services
     public function setNom(string $nom): static
     {
         $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function setIdentifiant(string $identifiant): static
+    {
+        $this->identifiant = $identifiant;
 
         return $this;
     }
@@ -88,44 +96,56 @@ class Services
         return $this;
     }
 
-    /**
-     * @return Collection<int, Poles>
-     */
     public function getPolesService(): Collection
     {
         return $this->poles_service;
     }
 
-    public function addPolesService(Poles $polesService): static
+    public function addPoleService(Poles $pole): self
     {
-        if (!$this->poles_service->contains($polesService)) {
-            $this->poles_service->add($polesService);
-            $polesService->setServices($this);
+        if (!$this->poles_service->contains($pole)) {
+            $this->poles_service->add($pole);
+            $pole->setServices($this); // Mise à jour de l'autre côté
         }
 
         return $this;
     }
 
-    public function removePolesService(Poles $polesService): static
+    public function removePoleService(Poles $pole): self
     {
-        if ($this->poles_service->removeElement($polesService)) {
-            // set the owning side to null (unless already changed)
-            if ($polesService->getServices() === $this) {
-                $polesService->setServices(null);
+        if ($this->poles_service->removeElement($pole)) {
+            // Vérifie si le Pole appartient bien à ce Service avant de l'enlever
+            if ($pole->getServices() === $this) {
+                $pole->setServices(null);
             }
         }
 
         return $this;
     }
 
-    public function getProcessus(): ?Processus
+    /**
+     * @return Collection<int, Poles>
+     */
+    public function getProcessus(): Collection
     {
         return $this->processus;
     }
 
-    public function setProcessus(?Processus $processus): static
+    public function addProcessus(Processus $processus): static
     {
-        $this->processus = $processus;
+        if (!$this->processus->contains($processus)) {
+            $this->processus->add($processus);
+            $processus->addService($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProcessus(Processus $processus): static
+    {
+        if ($this->poles_service->removeElement($processus)) {
+            $processus->removeService($this);
+        }
 
         return $this;
     }

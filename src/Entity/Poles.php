@@ -36,7 +36,7 @@ class Poles
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'poles')]
     private Collection $personnel;
 
-    #[ORM\ManyToOne(inversedBy: 'poles_service')]
+    #[ORM\ManyToOne(targetEntity: Services::class, inversedBy: 'poles_service')]
     private ?Services $services = null;
 
     #[ORM\ManyToOne(inversedBy: 'poles')]
@@ -129,7 +129,7 @@ class Poles
         return $this->services;
     }
 
-    public function setServices(?Services $services): static
+    public function setServices(?Services $services): self
     {
         $this->services = $services;
 

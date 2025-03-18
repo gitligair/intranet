@@ -16,7 +16,17 @@ class PolesType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('nom');
+            ->add('nom')
+            ->add('isOnline', null, [
+                'label' => 'En ligne',
+            ])
+            ->add('processus', EntityType::class, [
+                'class' => Processus::class,
+                'choice_label' => 'nom',
+                'multiple' => false,
+                'expanded' => false,
+                'required' => false,
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
