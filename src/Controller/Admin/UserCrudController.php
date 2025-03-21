@@ -48,11 +48,14 @@ class UserCrudController extends AbstractCrudController
             TextField::new('prenom'),
             TextField::new('nom'),
             EmailField::new('email'),
-            TextField::new('password', 'mot de passe')->setFormType(PasswordType::class)->onlyOnForms(),
-            TextField::new('password_', 'Confirmer le mot de passe')
+            TextField::new('password', 'mot de passe')->setFormType(PasswordType::class)->onlyWhenCreating(),
+            // Champ de vérification du mot de passe
+            TextField::new('password_')
                 ->setFormType(PasswordType::class)
-                ->setRequired($pageName === Crud::PAGE_NEW || $pageName === Crud::PAGE_EDIT)
-                ->setHelp('Veuillez retaper le même mot de passe.'), // 🚨 Ce champ ne sera pas stocké en base de données !
+                ->setLabel('Vérification du mot de passe')
+                ->setHelp('Veuillez entrer à nouveau votre mot de passe pour vérification') // 🚨 Ce champ ne sera pas stocké en base de données !
+                ->setFormTypeOption('mapped', false)
+                ->onlyWhenCreating(),  // Ce champ ne doit pas être mappé à l'entité
             ChoiceField::new('roles', 'Rôles')
                 ->setChoices([
                     'Stagiaire' => 'ROLE_STAGIAIRE',
@@ -75,17 +78,16 @@ class UserCrudController extends AbstractCrudController
         }
 
         // Récupérer le mot de passe du formulaire (qui n'est pas stocké en base)
-        $confirmPassword = $this->getContext()->getRequest()->get('password_');
+        $confirmPassword = $this->getContext()->getRequest()->get('User')['password_'];
 
-        dd($confirmPassword, $entityInstance->getPassword());
-
-        if ($entityInstance->getPassword() !== $confirmPassword) {
+        if ($entityInstance->getPassword() != $confirmPassword) {
             throw new \RuntimeException('Les mots de passe ne correspondent pas.');
         }
 
         if ($entityInstance->getPassword()) {
             $hashedPassword = $this->passwordHasher->hashPassword($entityInstance, $entityInstance->getPassword());
-            $entityInstance->setPassword($hashedPassword);
+            $entityInstance->setPassword($hashedPassword)
+                ->setIsOnline(false);
         }
 
         parent::persistEntity($entityManager, $entityInstance);

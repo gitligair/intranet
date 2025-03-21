@@ -39,10 +39,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Length(min: 8, minMessage: 'Le mot de passe doit contenir au moins 8 caractères')]
     private ?string $password = null;
 
-    #[ORM\Column]
-    #[Assert\NotBlank(groups: ['create'])]
-    #[Assert\EqualTo(propertyPath: "password", message: "Les mots de passe ne correspondent pas.")]
-    private ?string $password_ = null;
 
     #[ORM\Column(length: 255)]
     private ?string $nom = null;
@@ -143,11 +139,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    public function getPassword_(): ?string
-    {
-        return $this->password;
-    }
-
     public function setPassword(string $password): static
     {
         $this->password = $password;
@@ -155,18 +146,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    // // Confirmation du mot de passe
-    // public function getPassword_(): ?string
-    // {
-    //     return $this->password;
-    // }
 
-    // public function setPassword_(string $password): static
-    // {
-    //     $this->password = $password;
-
-    //     return $this;
-    // }
 
     /**
      * @see UserInterface
