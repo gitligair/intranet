@@ -1,0 +1,5 @@
+.ea-disabled .select2-selection {
+  background-color: #e9ecef;
+  pointer-events: none;
+  opacity: 0.65;
+}

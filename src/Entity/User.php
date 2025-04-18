@@ -74,10 +74,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $services;
 
 
+
+    #[ORM\ManyToOne(inversedBy: 'occupant')]
+    private ?Bureau $bureau = null;
+
+    /**
+     * @var Collection<int, Materiel>
+     */
+    #[ORM\OneToMany(targetEntity: Materiel::class, mappedBy: 'createdBy')]
+    private Collection $materiels;
+
+    /**
+     * @var Collection<int, Materiel>
+     */
+    #[ORM\OneToMany(targetEntity: Materiel::class, mappedBy: 'utilisateur')]
+    private Collection $materielsAlloues;
+
+
     public function __construct()
     {
         $this->poles = new ArrayCollection();
         $this->services = new ArrayCollection();
+        $this->materiels = new ArrayCollection();
+        $this->materielsAlloues = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -273,6 +292,80 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($service->getResponsable() === $this) {
                 $service->setResponsable(null);
+            }
+        }
+
+        return $this;
+    }
+
+
+
+    public function getBureau(): ?Bureau
+    {
+        return $this->bureau;
+    }
+
+    public function setBureau(?Bureau $bureau): static
+    {
+        $this->bureau = $bureau;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Materiel>
+     */
+    public function getMateriels(): Collection
+    {
+        return $this->materiels;
+    }
+
+    public function addMateriel(Materiel $materiel): static
+    {
+        if (!$this->materiels->contains($materiel)) {
+            $this->materiels->add($materiel);
+            $materiel->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMateriel(Materiel $materiel): static
+    {
+        if ($this->materiels->removeElement($materiel)) {
+            // set the owning side to null (unless already changed)
+            if ($materiel->getCreatedBy() === $this) {
+                $materiel->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Materiel>
+     */
+    public function getMaterielsAlloues(): Collection
+    {
+        return $this->materielsAlloues;
+    }
+
+    public function addMaterielsAlloue(Materiel $materielsAlloue): static
+    {
+        if (!$this->materielsAlloues->contains($materielsAlloue)) {
+            $this->materielsAlloues->add($materielsAlloue);
+            $materielsAlloue->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMaterielsAlloue(Materiel $materielsAlloue): static
+    {
+        if ($this->materielsAlloues->removeElement($materielsAlloue)) {
+            // set the owning side to null (unless already changed)
+            if ($materielsAlloue->getUtilisateur() === $this) {
+                $materielsAlloue->setUtilisateur(null);
             }
         }
 

@@ -2,10 +2,13 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Poles;
-use App\Entity\Processus;
 use App\Entity\User;
+use App\Entity\Ecran;
+use App\Entity\Poles;
+use App\Entity\Bureau;
 use App\Entity\Services;
+use App\Entity\Processus;
+use App\Entity\TypeMateriel;
 use Symfony\Component\HttpFoundation\Response;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
@@ -42,6 +45,14 @@ class AdministrationController extends AbstractDashboardController
 
             MenuItem::section('Utilisateurs..'),
             MenuItem::linkToCrud('LIGAIR tous', 'fa fa-user', User::class),
+
+            MenuItem::section('Informatique'),
+            MenuItem::subMenu('Configuration', 'fa-solid fa-tools')->setSubItems([
+                MenuItem::linkToCrud('Types de matériel', 'fa-solid fa-box', TypeMateriel::class),
+            ]),
+
+            MenuItem::linkToCrud('Bureaux', 'fa-solid fa-house-laptop', Bureau::class),
+            MenuItem::linkToCrud('Ecrans', 'fa-solid fa-desktop', Ecran::class),
         ];
     }
 }
