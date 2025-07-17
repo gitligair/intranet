@@ -1,33 +1,20 @@
 {
-  "name": "ligair.local",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "directories": {
-    "test": "tests"
+  "devDependencies": {
+    "@babel/core": "^7.28.0",
+    "@babel/preset-env": "^7.28.0",
+    "babel-loader": "^9.2.1",
+    "postcss-loader": "^8.1.1",
+    "sass": "^1.89.2",
+    "sass-loader": "^16.0.5",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
   },
   "scripts": {
-    "start": "webpack serve",
-    "dev-server": "encore dev-server",
     "dev": "encore dev",
     "watch": "encore dev --watch",
-    "build": "encore production --progress"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "devDependencies": {
-    "@babel/preset-env": "^7.26.9",
-    "@babel/preset-react": "^7.26.3",
-    "@symfony/webpack-encore": "^5.1.0",
-    "babel-loader": "^10.0.0",
-    "sass": "^1.86.3",
-    "sass-loader": "^16.0.5",
-    "ts-loader": "^9.5.2",
-    "typescript": "^5.8.3"
+    "build": "encore production"
   },
   "dependencies": {
-    "bootstrap": "^5.3.5"
+    "@symfony/webpack-encore": "^5.1.0"
   }
 }

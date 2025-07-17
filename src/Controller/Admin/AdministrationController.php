@@ -6,6 +6,9 @@ use App\Entity\User;
 use App\Entity\Ecran;
 use App\Entity\Poles;
 use App\Entity\Bureau;
+use App\Entity\Materiel;
+use App\Entity\Ordinateur;
+use App\Entity\Petitmateriel;
 use App\Entity\Services;
 use App\Entity\Processus;
 use App\Entity\TypeMateriel;
@@ -47,12 +50,17 @@ class AdministrationController extends AbstractDashboardController
             MenuItem::linkToCrud('LIGAIR tous', 'fa fa-user', User::class),
 
             MenuItem::section('Informatique'),
+            MenuItem::linkToCrud('Bureaux', 'fa-solid fa-house-laptop', Bureau::class),
             MenuItem::subMenu('Configuration', 'fa-solid fa-tools')->setSubItems([
                 MenuItem::linkToCrud('Types de matériel', 'fa-solid fa-box', TypeMateriel::class),
             ]),
 
-            MenuItem::linkToCrud('Bureaux', 'fa-solid fa-house-laptop', Bureau::class),
-            MenuItem::linkToCrud('Ecrans', 'fa-solid fa-desktop', Ecran::class),
+            MenuItem::section('Matériels'),
+            MenuItem::linkToCrud('Tous matériels', 'fa-solid fa-box', Materiel::class),
+            MenuItem::linkToCrud('Ecrans', 'fa-solid fa-window-maximize', Ecran::class),
+            MenuItem::linkToCrud('Ordinateurs', 'fa-solid fa-desktop', Ordinateur::class),
+            MenuItem::linkToCrud('Autres materiels', 'fa-brands fa-usb', Petitmateriel::class),
+
         ];
     }
 }

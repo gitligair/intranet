@@ -11,7 +11,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: MaterielRepository::class)]
 #[ORM\InheritanceType("JOINED")]
-#[ORM\DiscriminatorColumn(name: "type", type: "string")]
+#[ORM\DiscriminatorColumn(name: "typage", type: "string")]
 #[ORM\DiscriminatorMap([
     "ecran" => Ecran::class,
     "ordinateur" => Ordinateur::class,

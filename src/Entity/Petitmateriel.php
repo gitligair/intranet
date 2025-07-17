@@ -5,14 +5,12 @@ namespace App\Entity;
 use App\Repository\PetitmaterielRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PetitmaterielRepository::class)]
-class Petitmateriel
+class Petitmateriel extends Materiel
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     private ?string $denominatif = null;
@@ -21,15 +19,12 @@ class Petitmateriel
     private ?string $intitule = null;
 
     #[ORM\Column(length: 255)]
+    #[Gedmo\Slug(fields: ['denominatif'])]
     private ?string $slug = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $remarques = null;
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getDenominatif(): ?string
     {
@@ -77,5 +72,10 @@ class Petitmateriel
         $this->remarques = $remarques;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getType()->getNom() . ' - ' . $this->getDenominatif() . ' ' . $this->getIntitule();
     }
 }

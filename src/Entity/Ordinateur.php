@@ -3,16 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\OrdinateurRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OrdinateurRepository::class)]
-class Ordinateur
+class Ordinateur extends Materiel
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     private ?string $modele = null;
@@ -42,12 +39,9 @@ class Ordinateur
     private ?string $identifiant = null;
 
     #[ORM\Column(length: 255)]
+    #[Gedmo\Slug(fields: ['identifiant'])]
     private ?string $slug = null;
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getModele(): ?string
     {
@@ -167,5 +161,9 @@ class Ordinateur
         $this->slug = $slug;
 
         return $this;
+    }
+    public function __toString(): string
+    {
+        return $this->getType()->getNom() . ' - ' . $this->getModele() . ' ' . $this->getIdentifiant();
     }
 }

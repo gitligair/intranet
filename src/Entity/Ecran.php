@@ -22,7 +22,7 @@ class Ecran extends Materiel
     #[ORM\Column(nullable: true)]
     private ?float $taille = null;
 
-    #[ORM\Column(type: 'json', nullable: true)]
+    #[ORM\Column(nullable: true)]
     private ?array $connecteurs = null;
 
 
@@ -72,5 +72,11 @@ class Ecran extends Materiel
         $this->connecteurs = $connecteurs;
 
         return $this;
+    }
+
+
+    public function __toString()
+    {
+        return $this->getType()->getNom() . ' - ' . $this->getMarque() . ' ' . $this->getNumSerie();
     }
 }

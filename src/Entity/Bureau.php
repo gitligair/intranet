@@ -131,4 +131,17 @@ class Bureau
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return $this->nom;
+    }
+    public function getOccupantCount(): int
+    {
+        return $this->occupant->count();
+    }
+    public function getMaterielCount(): int
+    {
+        return $this->materiels->count();
+    }
 }

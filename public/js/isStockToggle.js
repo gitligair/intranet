@@ -1,31 +1,21 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const isStockCheckbox = document.querySelector('input[name$="[isStock]"]');
-  const localisationField = document.querySelector(
-    '[data-ea-field-name="localisation"] select'
-  );
-  const utilisateurField = document.querySelector(
-    '[data-ea-field-name="utilisateur"] select'
-  );
+document.addEventListener("DOMContentLoaded", function () {
+  const isStock = document.querySelector("#Ecran_isStock");
 
-  if (!isStockCheckbox || !localisationField || !utilisateurField) return;
+  // Identifie les containers des champs localisation et utilisateur
+  const lesAssociations = document.querySelector(".enStock");
 
-  const toggleFields = () => {
-    const checked = isStockCheckbox.checked;
-
-    // Désactiver les selects natifs
-    localisationField.disabled = checked;
-    utilisateurField.disabled = checked;
-
-    // Désactiver les Select2 si initialisés
-    if ($(localisationField).hasClass("select2-hidden-accessible")) {
-      $(localisationField).select2(checked ? "disable" : "enable");
+  function toggleAssociationFields() {
+    if (isStock.checked) {
+      // Affiche les champs si isStock est coché
+      lesAssociations.style.display = "";
+    } else {
+      // Cache les champs sinon
+      lesAssociations.style.display = "none";
     }
+  }
 
-    if ($(utilisateurField).hasClass("select2-hidden-accessible")) {
-      $(utilisateurField).select2(checked ? "disable" : "enable");
-    }
-  };
-
-  isStockCheckbox.addEventListener("change", toggleFields);
-  toggleFields();
+  if (isStock && lesAssociations) {
+    toggleAssociationFields(); // Initial
+    isStock.addEventListener("change", toggleAssociationFields); // Dynamique
+  }
 });

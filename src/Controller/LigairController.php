@@ -13,4 +13,21 @@ final class LigairController extends AbstractController
     {
         return $this->redirectToRoute('admin');
     }
+
+    // Fonction qui affiche les differents onglets de l'application
+    #[Route('/onglets', name: 'app_ligair_onglets')]
+    public function onglets(): Response
+    {
+        return $this->render('ligair/index.html.twig', [
+            'controller_name' => 'LigairController',
+            'onglets' => [
+                'Accueil',
+                'Clients',
+                'Commandes',
+                'Produits',
+                'Statistiques',
+                'Paramètres'
+            ]
+        ]);
+    }
 }
