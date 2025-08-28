@@ -1,7 +1,28 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Accueil{% endblock %}
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .section {
+
+        height: 100vh;
+    }
+</style>
+{% endblock %}
+
 
 {% block body %}
+<div class="container my-5 py-5">
 
+    {% include "ligair/sections/services.html.twig" %}
+
+    {% include "ligair/sections/projets.html.twig" %}
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="{{ asset('js/ligair.js') }}"></script>
 {% endblock %}

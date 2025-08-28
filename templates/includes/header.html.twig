@@ -1,0 +1,42 @@
+<header id="mainNavbar" class="main-header sticky-top">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg main-nav px-0 transition">
+            <a class="navbar-brand" href="/admin">
+                <img src="{{asset('images/logos/text.svg')}}" alt="Intranet LIGAIR">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainMenu"
+                aria-controls="mainMenu" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="icon-bar icon-bar-1"></span>
+                <span class="icon-bar icon-bar-2"></span>
+                <span class="icon-bar icon-bar-3"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainMenu" style="justify-content: end;">
+                <ul class="navbar-nav ml-auto text-uppercase f1">
+                    <li>
+                        <a href="{{path('app_ligair_accueil')}}" class=" active-first ">accueil</a>
+                    </li>
+                    <li>
+                        <a href="{{path('admin')}}" class="lien">gestion interne</a>
+                    </li>
+                    {% set url = app.request.attributes.get('_route') %}
+                    {% if url != "app_services" %}
+
+                    <li>
+                        <a href="#services" data-target="services" class="lien">services</a>
+                    </li>
+                    <li>
+                        <a href="#projets" data-target="projets" class="lien">projets</a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="#team" class="lien">team</a>
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </nav>
+    </div>
+    <!-- /.container -->
+</header>

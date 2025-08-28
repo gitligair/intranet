@@ -1,0 +1,60 @@
+<div id="services" class="section active text-light">
+    <h2 class="titre_section">Les services </h2>
+    <p>Repertoire des services Intranet de LIGAIR (API, applications internes...)</p>
+
+    <div class="container py-5">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+
+            <!-- Bloc 1 -->
+            <div class="col">
+                <a href="{{path('app_services')}}" class="text-decoration-none text-dark">
+                    <div
+                        class="d-flex flex-column align-items-center text-center p-4 border rounded shadow-sm hover-card h-100">
+                        <i class="bi bi-cloud-drizzle fs-1 text-primary mb-3"></i>
+                        <h5 class="mb-1">DONNEES METEO CENTRE</h5>
+                        <p class="text-muted small mb-0">Acces API Wheatherlink</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Bloc 2 -->
+            <div class="col">
+                <a href="http://ligair.net/signalair" target="_blank" class="text-decoration-none text-dark">
+                    <div
+                        class="d-flex flex-column align-items-center text-center p-4 border rounded shadow-sm hover-card h-100">
+                        <i class="bi bi-noise-reduction fs-1 text-success mb-3"></i>
+                        <h5 class="mb-1">SOS</h5>
+                        <p class="text-muted small mb-0">Application de gestion des signalements odeurs</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Bloc 3 -->
+            <div class="col">
+                <a href="#link3" class="text-decoration-none text-dark">
+                    <div
+                        class="d-flex flex-column align-items-center text-center p-4 border rounded shadow-sm hover-card h-100">
+                        <i class="bi bi-gear-fill fs-1 text-warning mb-3"></i>
+                        <h5 class="mb-1">Paramètres</h5>
+                        <p class="text-muted small mb-0">Configurez votre compte et vos options.</p>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <style>
+        .hover-card {
+            background-color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .hover-card:hover {
+            background-color: #a5cff8;
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        }
+    </style>
+
+</div>

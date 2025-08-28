@@ -15,7 +15,7 @@ final class LigairController extends AbstractController
     }
 
     // Fonction qui affiche les differents onglets de l'application
-    #[Route('/onglets', name: 'app_ligair_onglets')]
+    #[Route('/onglets', name: 'app_ligair_accueil')]
     public function onglets(): Response
     {
         return $this->render('ligair/index.html.twig', [
