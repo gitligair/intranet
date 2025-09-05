@@ -7,11 +7,13 @@ use App\Entity\Ecran;
 use App\Entity\Poles;
 use App\Entity\Bureau;
 use App\Entity\Materiel;
-use App\Entity\Ordinateur;
-use App\Entity\Petitmateriel;
 use App\Entity\Services;
 use App\Entity\Processus;
+use App\Entity\Ordinateur;
+use App\Entity\CotechVacarm;
 use App\Entity\TypeMateriel;
+use App\Entity\Petitmateriel;
+use App\Entity\CotechVacarmMateriel;
 use Symfony\Component\HttpFoundation\Response;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
@@ -60,6 +62,10 @@ class AdministrationController extends AbstractDashboardController
             MenuItem::linkToCrud('Ecrans', 'fa-solid fa-window-maximize', Ecran::class),
             MenuItem::linkToCrud('Ordinateurs', 'fa-solid fa-desktop', Ordinateur::class),
             MenuItem::linkToCrud('Autres materiels', 'fa-brands fa-usb', Petitmateriel::class),
+
+            MenuItem::section('Coteech VACARM'),
+            MenuItem::linkToCrud('COTECH VACARM', 'fa-solid fa-gears', CotechVacarm::class),
+            MenuItem::linkToCrud('Materiel', 'fa-solid fa-gears', CotechVacarmMateriel::class),
 
         ];
     }

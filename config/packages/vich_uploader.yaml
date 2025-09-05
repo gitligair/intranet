@@ -1,0 +1,8 @@
+vich_uploader:
+    db_driver: orm
+
+    mappings:
+       cotech_vacarm:
+           uri_prefix: /images/cotech_vacarm
+           upload_destination: '%kernel.project_dir%/public/images/cotech_vacarm'
+           namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
