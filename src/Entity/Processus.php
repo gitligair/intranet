@@ -42,10 +42,17 @@ class Processus
     #[ORM\OneToMany(targetEntity: Poles::class, mappedBy: 'processus')]
     private Collection $poles;
 
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'processuses')]
+    private Collection $pilotes;
+
     public function __construct()
     {
         $this->services = new ArrayCollection();
         $this->poles = new ArrayCollection();
+        $this->pilotes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -163,5 +170,29 @@ class Processus
     public function __toString(): string
     {
         return strtoupper($this->nom);
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getPilotes(): Collection
+    {
+        return $this->pilotes;
+    }
+
+    public function addPilote(User $pilote): static
+    {
+        if (!$this->pilotes->contains($pilote)) {
+            $this->pilotes->add($pilote);
+        }
+
+        return $this;
+    }
+
+    public function removePilote(User $pilote): static
+    {
+        $this->pilotes->removeElement($pilote);
+
+        return $this;
     }
 }

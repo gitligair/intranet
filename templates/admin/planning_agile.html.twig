@@ -1,0 +1,448 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block page_title %}Planning hebdomadaire
+{% endblock %}
+{% block content_title %}
+	Planning de la semaine
+
+{% endblock %}
+{% block page_actions %}
+	<a href="{{ ea_url().setRoute('admin_planning_grille') }}" class="btn btn-info">
+		📊 Planning utilisateurs
+	</a>
+{% endblock %}
+
+
+{% block main %}
+	<style>
+		#alert-container {
+			position: fixed;
+			top: 15px;
+			right: 15px;
+			z-index: 9999;
+			width: 350px;
+		}
+
+
+		.task-item:hover {
+			background: #f0f4ff !important;
+			transition: 0.2s;
+			border-color: #c8d8ff !important;
+		}
+
+		.user-chip {
+			display: inline-block;
+			background: #dfe6ff;
+			border-radius: 50px;
+			padding: 2px 8px;
+			margin-right: 4px;
+			font-size: 0.75rem;
+			font-weight: 600;
+			color: #3b4cca;
+		}
+
+		.icon-btn {
+			width: 30px;
+			height: 30px;
+			border-radius: 50%;
+			border: none;
+			background: #f0f2f5;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			transition: 0.2s;
+		}
+
+		.icon-btn:hover {
+			transform: scale(1.12);
+		}
+
+		.icon-edit {
+			color: #285de6;
+		}
+
+		.icon-edit:hover {
+			background: #e4eaff;
+		}
+
+		.icon-delete {
+			color: #e63946;
+		}
+
+		.icon-delete:hover {
+			background: #ffe3e3;
+		}
+	</style>
+
+
+	<!-- 🧱 Conteneur du planning -->
+	<div id="planning_container">
+		{% include 'admin/_planning_content.html.twig' %}
+	</div>
+
+	<!-- 🟢 MODAL FORMULAIRE (AJOUT / MODIF) -->
+	<div class="modal fade" id="taskModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<form id="taskForm">
+					<div class="modal-header">
+						<h5 class="modal-title" id="modalTitle">Nouvelle tâche</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+					</div>
+					<div class="modal-body">
+						<input type="hidden" id="taskId">
+						<input type="hidden" id="taskDate">
+
+						<div class="mb-3">
+							<label class="form-label">Pôle</label>
+							<select name="pole" class="form-select" required>
+								{% for pole in poles %}
+									<option value="{{ pole.id }}">{{ pole.nom }}</option>
+								{% endfor %}
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Titre</label>
+							<input type="text" class="form-control" name="titre" required>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Description</label>
+							<textarea name="description" id="description" class="form-control" placeholder="Description de la tâche"></textarea>
+						</div>
+
+
+						<div class="mb-3">
+							<label class="form-label">Assigné à</label>
+							<select name="assignerA[]" class="form-select" multiple id="assignesSelect"></select>
+							<small id="assignWarning" class="text-danger d-none mt-1"></small>
+						</div>
+
+
+						<div class="mb-3">
+							<label class="form-label">Importance</label>
+							<select name="importance" class="form-select">
+								<option value="haute">Haute</option>
+								<option value="moyenne" selected>Moyenne</option>
+								<option value="basse">Basse</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Heure de début</label>
+							<input type="time" name="heureDebut" class="form-control">
+						</div>
+
+						<div class="mb-3">
+							<label class="form-label">Heure de fin</label>
+							<input type="time" name="heureFin" class="form-control">
+						</div>
+
+
+						<div class="mb-3">
+							<label class="form-label">Deadline</label>
+							<input type="date" name="deadline" class="form-control">
+						</div>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+						<button type="submit" class="btn btn-primary">Enregistrer</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<!-- 🔔 Zone d'affichage des messages -->
+	<div id="alert-container" class="my-2"></div>
+
+	<script>
+		async function changeWeek(delta) {
+const input = document.getElementById('weekOffset');
+const newOffset = parseInt(input.value) + delta;
+input.value = newOffset;
+
+const url = "/admin/planning/week?week_offset=" + newOffset;
+
+const res = await fetch(url);
+const html = await res.text();
+
+// remplacer le planning complet
+document.getElementById('planning_container').innerHTML = html;
+
+// réinitialiser les events (important!)
+initPlanningEvents();
+}
+
+// 🧩 Affichage des alertes Bootstrap
+function showAlert(message, type = 'success') {
+const container = document.getElementById('alert-container');
+const alert = document.createElement('div');
+
+alert.className = `alert alert-${type} alert-dismissible fade show shadow-lg`;
+alert.style.marginBottom = "10px";
+alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+container.appendChild(alert);
+
+// disparition automatique
+setTimeout(() => {
+const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+bsAlert.close();
+}, 4000);
+}
+
+
+// 🔁 Recharge dynamique du planning
+async function reloadPlanning() {
+const container = document.getElementById('planning_container');
+const res = await fetch('{{ path("admin_planning_partial") }}');
+const html = await res.text();
+container.innerHTML = html;
+initPlanningEvents(); // Réattache les events
+}
+
+// 🔧 Initialisation globale
+function initPlanningEvents() {
+
+const modal = new bootstrap.Modal(document.getElementById('taskModal'));
+const form = document.getElementById('taskForm');
+
+const modalTitle = document.getElementById('modalTitle');
+const taskIdInput = document.getElementById('taskId');
+const taskDateInput = document.getElementById('taskDate');
+
+const poleSelect = form.querySelector('[name="pole"]');
+const assignSelect = document.getElementById('assignesSelect');
+const warning = document.getElementById('assignWarning');
+
+// 🔄 Charger les utilisateurs d’un pôle
+async function loadUsersForPole(poleId) {
+const res = await fetch('{{ path("admin_planning_users_by_pole") }}', {
+method: 'POST',
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify(
+{pole_id: poleId}
+)
+});
+
+const json = await res.json();
+assignSelect.innerHTML = ''; // Vider
+
+if (json.users) {
+json.users.forEach(u => {
+const opt = document.createElement('option');
+opt.value = u.id;
+opt.textContent = u.name;
+assignSelect.appendChild(opt);
+});
+}
+}
+
+// ➕ Ajouter une tâche
+document.querySelectorAll('.add-task-btn').forEach(btn => {
+btn.addEventListener('click', async () => {
+modalTitle.textContent = 'Nouvelle tâche';
+form.reset();
+taskIdInput.value = '';
+taskDateInput.value = btn.dataset.date;
+
+await loadUsersForPole(poleSelect.value);
+
+modal.show();
+});
+});
+
+// ✏️ Modifier une tâche
+document.querySelectorAll('.edit-task-btn').forEach(btn => {
+btn.addEventListener('click', async () => {
+
+modalTitle.textContent = 'Modifier la tâche';
+
+taskIdInput.value = btn.dataset.id;
+taskDateInput.value = btn.dataset.dateexecution;
+
+// Champs principaux
+form.querySelector('[name="titre"]').value = btn.dataset.titre || '';
+form.querySelector('[name="description"]').value = btn.dataset.description || '';
+form.querySelector('[name="importance"]').value = btn.dataset.importance || '';
+form.querySelector('[name="deadline"]').value = btn.dataset.deadline || '';
+
+// Heures
+form.querySelector('[name="heureDebut"]').value = btn.dataset.heuredebut || '';
+form.querySelector('[name="heureFin"]').value = btn.dataset.heurefin || '';
+
+// Pôle
+const poleId = btn.dataset.pole;
+poleSelect.value = poleId;
+
+// Charger les utilisateurs du pôle AVANT de cocher les assignés
+await loadUsersForPole(poleId);
+
+// Pré-sélectionner les assignés
+const assigned = btn.dataset.assignera ? btn.dataset.assignera.split(',') : [];
+
+assigned.forEach(userId => {
+const opt = assignSelect.querySelector (`option[value="${userId}"]`);
+if (opt) 
+opt.selected = true;
+
+
+
+});
+
+modal.show();
+});
+});
+
+// 🗑️ Supprimer
+document.querySelectorAll('.delete-task-btn').forEach(btn => {
+btn.addEventListener('click', async () => {
+if (!confirm('Supprimer cette tâche ?')) 
+return;
+
+
+
+const id = btn.dataset.id;
+const url = `{{ path('admin_planning_delete', {'id': 'REPLACE'}) }}`.replace('REPLACE', id);
+
+const res = await fetch(url, {method: 'DELETE'});
+var json = await res.json();
+
+
+if (res.ok) {
+showAlert('Tâche supprimée avec succès ✅', 'success');
+await reloadPlanning();
+} else {
+modal.hide("slow");
+
+showAlert(json.message ?? 'Erreur inconnue 🚫', 'danger');
+
+}
+});
+});
+
+// 💾 Soumission AJAX (création / édition)
+form.onsubmit = async (e) => {
+e.preventDefault();
+
+const id = taskIdInput.value;
+
+const data = {
+pole_id: poleSelect.value,
+titre: form.querySelector('[name="titre"]').value,
+description: form.querySelector('[name="description"]').value,
+
+importance: form.querySelector('[name="importance"]').value,
+deadline: form.querySelector('[name="deadline"]').value,
+date: taskDateInput.value,
+assignes: Array.from(assignSelect.selectedOptions).map(opt => opt.value),
+heureDebut: form.querySelector('[name="heureDebut"]').value,
+heureFin: form.querySelector('[name="heureFin"]').value
+};
+
+const url = id ? `{{ path('admin_planning_update', {'id': 'REPLACE'}) }}`.replace('REPLACE', id) : `{{ path('admin_planning_save') }}`;
+
+const res = await fetch(url, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(data)
+});
+var json = await res.json();
+
+if (res.ok) {
+modal.hide();
+showAlert(id ? 'Tâche mise à jour avec succès ✅' : 'Tâche ajoutée avec succès ✅', 'success');
+await reloadPlanning();
+} else {
+modal.hide("slow");
+
+showAlert(json.message ?? 'Erreur inconnue 🚫', 'danger');
+
+
+}
+};
+
+// 🕒 Vérification des disponibilités assignés
+async function checkDisponibilites() {
+const date = taskDateInput.value;
+const heureDebut = form.querySelector('[name="heureDebut"]').value;
+const heureFin = form.querySelector('[name="heureFin"]').value;
+const assignes = Array.from(assignSelect.selectedOptions).map(opt => opt.value);
+
+if (! date || ! heureDebut || ! heureFin || assignes.length === 0) 
+return;
+
+
+
+const res = await fetch('{{ path("admin_planning_check_dispo") }}', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(
+{date, heureDebut, heureFin, assignes}
+)
+});
+
+var json = await res.json();
+
+// Réinitialiser tous les styles
+assignSelect.querySelectorAll('option').forEach(opt => {
+opt.style.color = '';
+opt.style.backgroundColor = '';
+});
+
+if (json.conflicts.length > 0) { // Texte d’alerte
+warning.classList.remove('d-none');
+warning.innerHTML = `⚠️ Conflits : ${
+json.conflicts.map(c => c.user).join(', ')
+}`;
+
+assignSelect.classList.add('is-invalid');
+
+// Coloration des utilisateurs en conflit
+json.conflicts.forEach(c => {
+const opt = assignSelect.querySelector (`option[value="${
+c.user_id
+}"]`);
+if (opt) {
+opt.style.color = 'white';
+opt.style.backgroundColor = '#dc3545'; // rouge bootstrap
+}
+});
+
+} else {
+warning.classList.add('d-none');
+warning.innerHTML = '';
+assignSelect.classList.remove('is-invalid');
+}
+}
+
+// Vérification live
+['change', 'blur'].forEach(evt => {
+assignSelect.addEventListener(evt, checkDisponibilites);
+form.querySelector('[name="heureDebut"]').addEventListener(evt, checkDisponibilites);
+form.querySelector('[name="heureFin"]').addEventListener(evt, checkDisponibilites);
+});
+
+// Charger la liste d’utilisateurs au changement de pôle
+poleSelect.addEventListener('change', () => {
+loadUsersForPole(poleSelect.value);
+});
+}
+
+// 🚀 Initialisation
+document.addEventListener('DOMContentLoaded', () => {
+initPlanningEvents();
+});
+	</script>
+
+
+{% endblock %}

@@ -1,0 +1,244 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block page_title %}Récap hebdomadaire
+{% endblock %}
+{% block content_title %}
+	Récapitulatif de la semaine ({{ startOfWeek|date('d/m') }}
+	→
+	{{ endOfWeek|date('d/m') }})
+
+{% endblock %}
+{% block page_actions %}
+	<a href="{{ ea_url().setRoute('admin_planning') }}" class="btn ">
+		Récap hebdomadaire →
+
+	</a>
+{% endblock %}
+
+
+{% block main %}
+	<div class="card mb-4 shadow-sm">
+		<div class="card-body">
+			<form
+				method="post" action="{{ ea_url().setRoute('admin_planning_recap') }}" class="row g-3">
+
+
+				<!-- Filtre par pôle -->
+				<div class="col-md-4">
+					<label class="form-label">Filtrer par pôle</label>
+					<select name="pole" class="form-select">
+						<option value="">Tous les pôles</option>
+						{% for pole in poles %}
+							<option value="{{ pole.id }}" {{ filterPole == pole.id ? 'selected' }}>
+								{{ pole.nom }}
+							</option>
+						{% endfor %}
+					</select>
+				</div>
+
+				<!-- Filtre par utilisateur -->
+				<div class="col-md-4">
+					<label class="form-label">Filtrer par utilisateur</label>
+					<select name="user" class="form-select">
+						<option value="">Tous les utilisateurs</option>
+						{% for u in users %}
+							<option value="{{ u.id }}" {{ filterUser == u.id ? 'selected' }}>
+								{{ u.prenom }}
+								{{ u.nom }}
+							</option>
+						{% endfor %}
+					</select>
+				</div>
+
+				<!-- Boutons -->
+				<div class="col-md-4 d-flex align-items-end gap-2">
+					<button type="submit" class="btn btn-primary w-50">
+						Filtrer
+					</button>
+					<a href="{{ ea_url().setRoute('admin_planning_recap') }}" class="btn btn-outline-danger w-50">
+
+						❌ Réinitialiser
+					</a>
+				</div>
+
+			</form>
+		</div>
+	</div>
+
+
+	<div class="row">
+
+
+		<div class="col-12">
+			<h2 class="mt-4">📌 Par Pôle :
+				<span>{{pole_concerne ? pole_concerne.nom : "Tous"}}</span>
+			</h2>
+		</div>
+		{% if pole_concerne %}
+			<div class="card shadow-sm">
+				<div class="card-header bg-primary text-white">
+					<strong>{{ pole_concerne.nom }}</strong>
+
+				</div>
+
+				<div class="card-body">
+					{% set tachesPole = taches|filter(t => t.pole.id == pole_concerne.id) %}
+
+
+					{% if tachesPole is empty %}
+						<p class="text-muted">Aucune tâche cette semaine.</p>
+					{% else %}
+						<ul class="list-group">
+							{% for t in tachesPole %}
+								<li class="list-group-item">
+									<strong>{{ t.dateExecution|date('D d/m') }}</strong>
+									—
+									{{ t.heureDebut|date('H:i') }}
+									→
+									{{ t.heureFin|date('H:i') }}
+									<br>
+									<span class="text-primary">{{ t.titre }}</span>
+
+									{% if t.assignerA|length > 0 %}
+										<br><small>
+											👥
+											{{ t.assignerA|map(a => a.prenom ~ ' ' ~ a.nom)|join(', ') }}
+										</small>
+									{% endif %}
+								</li>
+							{% endfor %}
+						</ul>
+					{% endif %}
+				</div>
+			</div>
+
+		{% else %}
+
+			{% for pole in poles %}
+				<div class="col-md-6 mt-3">
+					<div class="card shadow-sm">
+						<div class="card-header bg-primary text-white">
+							<strong>{{ pole.nom }}</strong>
+						</div>
+
+						<div class="card-body">
+							{% set tachesPole = taches|filter(t => t.pole.id == pole.id) %}
+
+
+							{% if tachesPole is empty %}
+								<p class="text-muted">Aucune tâche cette semaine.</p>
+							{% else %}
+								<ul class="list-group">
+									{% for t in tachesPole %}
+										<li class="list-group-item">
+											<strong>{{ t.dateExecution|date('D d/m') }}</strong>
+											—
+											{{ t.heureDebut|date('H:i') }}
+											→
+											{{ t.heureFin|date('H:i') }}
+											<br>
+											<span class="text-primary">{{ t.titre }}</span>
+
+											{% if t.assignerA|length > 0 %}
+												<br><small>
+													👥
+													{{ t.assignerA|map(a => a.prenom ~ ' ' ~ a.nom)|join(', ') }}
+												</small>
+											{% endif %}
+										</li>
+									{% endfor %}
+								</ul>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		{% endif %}
+
+
+		<!-- =============RECAP PAR PERSONNE============= -->
+		<div class="col-12">
+			<h2 class="mt-5">👤 Par Utilisateur :
+				<span>{{user_concerne ? user_concerne.prenom : "Tous"}}</span>
+			</h2>
+
+		</div>
+		{% if user_concerne %}
+			<div class="card shadow-sm">
+				<div class="card-header bg-dark text-white">
+					<strong>{{ user_concerne.prenom }}
+
+						{{ user_concerne.nom }}</strong>
+
+				</div>
+
+				<div class="card-body">
+					{% set tachesUser = taches|filter(t => user_concerne in t.assignerA) %}
+
+
+					{% if tachesUser is empty %}
+						<p class="text-muted">Aucune tâche cette semaine.</p>
+					{% else %}
+						<ul class="list-group">
+							{% for t in tachesUser %}
+								<li class="list-group-item">
+									<strong>{{ t.dateExecution|date('D d/m') }}</strong>
+									—
+									{{ t.heureDebut|date('H:i') }}
+									→
+									{{ t.heureFin|date('H:i') }}
+									<br>
+									<span class="text-primary">{{ t.titre }}</span>
+									<br>
+									<small class="text-muted">Pôle :
+										{{ t.pole.nom }}</small>
+								</li>
+							{% endfor %}
+						</ul>
+					{% endif %}
+				</div>
+			</div>
+
+		{% else %}
+			{% for user in users %}
+				<div class="col-md-6 mt-3">
+					<div class="card shadow-sm">
+						<div class="card-header bg-dark text-white">
+							<strong>{{ user.prenom }}
+								{{ user.nom }}</strong>
+						</div>
+
+						<div class="card-body">
+							{% set tachesUser = taches|filter(t => user in t.assignerA) %}
+
+							{% if tachesUser is empty %}
+								<p class="text-muted">Aucune tâche cette semaine.</p>
+							{% else %}
+								<ul class="list-group">
+									{% for t in tachesUser %}
+										<li class="list-group-item">
+											<strong>{{ t.dateExecution|date('D d/m') }}</strong>
+											—
+											{{ t.heureDebut|date('H:i') }}
+											→
+											{{ t.heureFin|date('H:i') }}
+											<br>
+											<span class="text-primary">{{ t.titre }}</span>
+											<br>
+											<small class="text-muted">Pôle :
+												{{ t.pole.nom }}</small>
+										</li>
+									{% endfor %}
+								</ul>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+
+		{% endif %}
+
+
+	</div>
+
+{% endblock %}

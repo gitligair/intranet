@@ -1,0 +1,138 @@
+<div class="row g-3">
+	<form method="get" id="weekForm" action="{{ ea_url().setRoute('admin_planning') }}">
+
+
+		<input type="hidden" id="weekOffset" value="{{ weekOffset|default(0) }}">
+
+
+		<div class="d-flex justify-content-between align-items-center mb-3">
+
+			<button type="button" class="btn btn-outline-primary" onclick="changeWeek(-1)">
+				← Semaine précédente
+			</button>
+
+			<h2>
+				Semaine du
+				{{ startOfWeek|date('d/m') }}
+				→
+				{{ endOfWeek|date('d/m') }}
+			</h2>
+
+			<button type="button" class="btn btn-outline-primary" onclick="changeWeek(1)">
+				Semaine suivante →
+			</button>
+
+		</div>
+	</form>
+
+
+	<h2>
+		({{ startOfWeek|date('d/m') }}
+		→
+		{{ endOfWeek|date('d/m') }})</h2>
+	{% for jour in 0..4 %}
+		{% set jourDate = startOfWeek|date_modify('+'~jour~' days') %}
+
+		<div class="col-12 col-md-6 col-lg-4 col-xl-3">
+			<div class="card shadow-sm h-100">
+				<div class="card-header d-flex justify-content-between align-items-center">
+					<span class="fw-bold">{{ jourDate|date('l d/m') }}</span>
+					<button class="btn btn-sm btn-primary add-task-btn" data-date="{{ jourDate|date('Y-m-d') }}">
+						+ Tâche
+					</button>
+				</div>
+				<div class="card-body">
+
+					{% for pole in poles %}
+						<div
+							class="mb-3">
+
+							<!-- Nom du pôle -->
+							<h6 class="text-uppercase text-primary fw-bold small mb-2">
+								{{ pole.nom }}
+							</h6>
+
+							<div id="taches-{{ pole.id }}-{{ jourDate|date('Y-m-d') }}" class="ps-2">
+
+								{% set tachesJour = taches|filter(t => t.pole == pole and t.dateExecution|date('Y-m-d') == jourDate|date('Y-m-d')) %}
+
+								{% if tachesJour is empty %}
+									<div class="text-muted small fst-italic ms-2">Aucune tâche ce jour.</div>
+
+								{% else %}
+
+									<ul class="list-unstyled">
+
+										{% for t in tachesJour %}
+
+											<li class="task-item d-flex justify-content-between align-items-start p-2 rounded-3 mb-2 shadow-sm border" data-id="{{ t.id }}" style="background:#fafafa;">
+
+												<div
+													style="flex:1">
+
+													<!-- Titre -->
+													<div class="fw-semibold">
+														{{ t.titre }}
+													</div>
+
+													<!-- Importance -->
+													<span class="badge rounded-pill {% if t.importance == 'haute' %} bg-danger-subtle {% elseif t.importance == 'moyenne' %} bg-warning-subtle text-dark {% else %} bg-success-subtle {% endif %}">
+														{{ t.importance|capitalize }}
+													</span>
+
+													<!-- Deadline -->
+													{% if t.deadline %}
+														<small class="text-muted">
+															• échéance :
+															{{ t.deadline|date('d/m') }}</small>
+													{% endif %}
+
+													<!-- Assignés -->
+													{% if t.assignerA|length > 0 %}
+														<div class="mt-1 small text-muted">
+															<span class="text-primary fw-semibold">Assignée à :</span>
+															{% for user in t.assignerA %}
+																<span class="user-chip">
+																	{{ user.prenom|first|upper }}{{ user.nom|first|upper }}
+																</span>
+															{% endfor %}
+														</div>
+													{% endif %}
+												</div>
+
+												<!-- Actions -->
+												{% if t.createdBy == app.user %}
+													<div class="task-actions d-flex flex-column">
+
+														<button class="icon-btn icon-edit edit-task-btn" data-id="{{ t.id }}" data-titre="{{ t.titre }}" data-description="{{ t.description }}" data-importance="{{ t.importance }}" data-deadline="{{ t.deadline ? t.deadline|date('Y-m-d') : '' }}" data-pole="{{ t.pole.id }}" data-assignera="{{ t.assignerA|map(a => a.id)|join(',') }}" data-heuredebut="{{ t.heureDebut ? t.heureDebut|date('H:i') : '' }}" data-heurefin="{{ t.heureFin ? t.heureFin|date('H:i') : '' }}" data-dateexecution="{{ t.dateExecution|date('Y-m-d') }}">
+
+
+															<i class="fa fa-pen"></i>
+														</button>
+
+														<button class="icon-btn icon-delete delete-task-btn mt-2" data-id="{{ t.id }}">
+															<i class="fa fa-trash"></i>
+														</button>
+
+													</div>
+
+
+												{% endif %}
+											</li>
+
+										{% endfor %}
+									</ul>
+
+								{% endif %}
+							</div>
+
+							<hr class="my-3">
+						</div>
+					{% endfor %}
+				</div>
+
+
+			</div>
+		</div>
+	{% endfor %}
+</div>

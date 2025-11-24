@@ -1,0 +1,199 @@
+/* -------------------------------------------------------
+   🌟 THEME EASYADMIN PREMIUM - TURQUOISE / SKY BLUE
+   Design SaaS professionnel
+   ------------------------------------------------------- */
+
+:root {
+    --color-primary: #48D7D0;
+    --color-primary-dark: #34b8b2;
+    --color-accent: #6ED6FF;
+    --color-bg: #f7fbfd;
+    --color-bg-card: #ffffff;
+    --color-bg-sidebar: #0F2A43;
+    --color-bg-sidebar-hover: rgba(255, 255, 255, 0.08);
+    --color-text: #1a2e3b;
+    --color-text-light: #e4faff;
+    --radius: 12px;
+    --shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+    --shadow-hover: 0 6px 26px rgba(0, 0, 0, 0.14);
+    --transition: 0.22s cubic-bezier(.25, .8, .25, 1);
+}
+
+/* GLOBAL -------------------------------------- */
+
+body,
+.content-body {
+    background: var(--color-bg) !important;
+    font-family: 'Inter', sans-serif !important;
+    color: var(--color-text) !important;
+}
+
+/* HEADERS ------------------------------------- */
+
+.content-header-title {
+    font-size: 1.9rem !important;
+    font-weight: 700 !important;
+    color: var(--color-primary) !important;
+    letter-spacing: -0.5px;
+}
+
+/* SIDEBAR ------------------------------------- */
+
+.sidebar {
+    background: var(--color-bg-sidebar) !important;
+    border-right: none !important;
+    padding-top: 1.4rem !important;
+}
+
+.sidebar .menu-section {
+    color: var(--color-text-light) !important;
+    opacity: 0.8;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    margin-top: 1.2rem !important;
+    margin-bottom: 0.4rem !important;
+    padding-left: 18px;
+}
+
+.sidebar .menu-item a {
+    color: var(--color-text-light) !important;
+    font-weight: 500;
+    border-radius: var(--radius);
+    transition: var(--transition);
+    padding: 10px 16px;
+}
+
+.sidebar .menu-item a:hover {
+    background: var(--color-bg-sidebar-hover) !important;
+    color: var(--color-accent) !important;
+}
+
+.sidebar .menu-item.active>a {
+    background: rgba(255, 255, 255, 0.14) !important;
+    color: var(--color-primary) !important;
+    font-weight: 600;
+}
+
+/* CARDS --------------------------------------- */
+
+.card {
+    border-radius: var(--radius) !important;
+    border: none !important;
+    background: var(--color-bg-card) !important;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+/* BUTTONS ------------------------------------- */
+
+.btn,
+.ea-button {
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    padding: 0.55rem 1.2rem !important;
+    border: 2px solid blue !important;
+    transition: var(--transition);
+}
+
+.btn-primary,
+.ea-button--primary {
+    background: var(--color-primary) !important;
+    color: #0F2A43 !important;
+}
+
+.btn-primary:hover,
+.ea-button--primary:hover {
+    background: var(--color-primary-dark) !important;
+}
+
+/* SECONDARY */
+.btn-secondary {
+    background: var(--color-accent) !important;
+    color: #0F2A43 !important;
+}
+
+.btn-secondary:hover {
+    background: #5ccaf3 !important;
+}
+
+/* TABLES -------------------------------------- */
+
+.datagrid thead th {
+    background: #f0fbff !important;
+    color: #0F2A43 !important;
+    font-weight: 700 !important;
+    border-bottom: 2px solid var(--color-accent) !important;
+}
+
+.datagrid tbody tr {
+    transition: var(--transition);
+}
+
+.datagrid tbody tr:hover {
+    background: rgba(110, 214, 255, 0.15) !important;
+}
+
+/* FORMS --------------------------------------- */
+
+form input,
+form select,
+form textarea {
+    border-radius: 10px !important;
+    border: 1px solid #d6eef7 !important;
+    background: #ffffff !important;
+    transition: var(--transition);
+}
+
+form input:focus,
+form select:focus,
+form textarea:focus {
+    border-color: var(--color-accent) !important;
+    box-shadow: 0 0 0 0.15rem rgba(110, 214, 255, 0.35) !important;
+}
+
+/* LABELS */
+form label {
+    font-weight: 600 !important;
+    color: #0F2A43 !important;
+}
+
+/* PAGINATION ---------------------------------- */
+
+.page-item.active .page-link {
+    background: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: #0F2A43 !important;
+}
+
+.page-link {
+    color: var(--color-primary) !important;
+    border-radius: 6px;
+}
+
+/* FLASH MESSAGES ------------------------------- */
+
+.alert {
+    border: none !important;
+    border-radius: var(--radius) !important;
+    box-shadow: var(--shadow);
+}
+
+.alert-success {
+    background: #dfffef !important;
+    color: #056b3b !important;
+}
+
+.alert-danger {
+    background: #ffe4e4 !important;
+    color: #9e1c1c !important;
+}
+
+.alert-info {
+    background: #e0f7ff !important;
+    color: #0c4b66 !important;
+}
+

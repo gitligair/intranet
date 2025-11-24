@@ -90,6 +90,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Materiel::class, mappedBy: 'utilisateur')]
     private Collection $materielsAlloues;
 
+    /**
+     * @var Collection<int, Poles>
+     */
+    #[ORM\OneToMany(targetEntity: Poles::class, mappedBy: 'responsable')]
+    private Collection $responsable_pole;
+
+    /**
+     * @var Collection<int, Tache>
+     */
+    #[ORM\ManyToMany(targetEntity: Tache::class, mappedBy: 'assignerA')]
+    private Collection $taches;
+
+    /**
+     * @var Collection<int, Processus>
+     */
+    #[ORM\ManyToMany(targetEntity: Processus::class, mappedBy: 'pilotes')]
+    private Collection $processuses;
+
+    /**
+     * @var Collection<int, Tache>
+     */
+    #[ORM\OneToMany(targetEntity: Tache::class, mappedBy: 'createdBy')]
+    private Collection $tachesCrees;
+
 
     public function __construct()
     {
@@ -97,6 +121,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->services = new ArrayCollection();
         $this->materiels = new ArrayCollection();
         $this->materielsAlloues = new ArrayCollection();
+        $this->responsable_pole = new ArrayCollection();
+        $this->taches = new ArrayCollection();
+        $this->processuses = new ArrayCollection();
+        $this->tachesCrees = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -366,6 +394,120 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($materielsAlloue->getUtilisateur() === $this) {
                 $materielsAlloue->setUtilisateur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Poles>
+     */
+    public function getResponsablePole(): Collection
+    {
+        return $this->responsable_pole;
+    }
+
+    public function addResponsablePole(Poles $responsablePole): static
+    {
+        if (!$this->responsable_pole->contains($responsablePole)) {
+            $this->responsable_pole->add($responsablePole);
+            $responsablePole->setResponsable($this);
+        }
+
+        return $this;
+    }
+
+    public function removeResponsablePole(Poles $responsablePole): static
+    {
+        if ($this->responsable_pole->removeElement($responsablePole)) {
+            // set the owning side to null (unless already changed)
+            if ($responsablePole->getResponsable() === $this) {
+                $responsablePole->setResponsable(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Tache>
+     */
+    public function getTaches(): Collection
+    {
+        return $this->taches;
+    }
+
+    public function addTach(Tache $tach): static
+    {
+        if (!$this->taches->contains($tach)) {
+            $this->taches->add($tach);
+            $tach->addAssignerA($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTach(Tache $tach): static
+    {
+        if ($this->taches->removeElement($tach)) {
+            $tach->removeAssignerA($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Processus>
+     */
+    public function getProcessuses(): Collection
+    {
+        return $this->processuses;
+    }
+
+    public function addProcessus(Processus $processus): static
+    {
+        if (!$this->processuses->contains($processus)) {
+            $this->processuses->add($processus);
+            $processus->addPilote($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProcessus(Processus $processus): static
+    {
+        if ($this->processuses->removeElement($processus)) {
+            $processus->removePilote($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Tache>
+     */
+    public function getTachesCrees(): Collection
+    {
+        return $this->tachesCrees;
+    }
+
+    public function addTachesCree(Tache $tachesCree): static
+    {
+        if (!$this->tachesCrees->contains($tachesCree)) {
+            $this->tachesCrees->add($tachesCree);
+            $tachesCree->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTachesCree(Tache $tachesCree): static
+    {
+        if ($this->tachesCrees->removeElement($tachesCree)) {
+            // set the owning side to null (unless already changed)
+            if ($tachesCree->getCreatedBy() === $this) {
+                $tachesCree->setCreatedBy(null);
             }
         }
 

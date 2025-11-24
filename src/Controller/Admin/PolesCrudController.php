@@ -30,6 +30,20 @@ class PolesCrudController extends AbstractCrudController
                 ->setFormTypeOptions([
                     'choice_label' => 'nom', // Change en fonction de ton entité Service
                 ]),
+            AssociationField::new('responsable', 'Pilote Pôle')
+                ->setFormTypeOptions([
+                    'by_reference' => true, // Important pour ManyToMany
+                    'multiple' => false,
+                ])
+                ->setCrudController(UserCrudController::class) // facultatif, pour navigation
+                ->autocomplete(), // active la recherche si tu as beaucoup d’utilisateurs
+            AssociationField::new('personnel', 'Present dans cette pôle :')
+                ->setFormTypeOptions([
+                    'by_reference' => false, // Important pour ManyToMany
+                    'multiple' => true,
+                ])
+                ->setCrudController(UserCrudController::class) // facultatif, pour navigation
+                ->autocomplete(), // active la recherche si tu as beaucoup d’utilisateurs
             BooleanField::new('isOnline', 'En ligne'),
         ];
     }

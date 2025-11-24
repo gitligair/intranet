@@ -1,0 +1,70 @@
+<div class="modal fade" id="taskModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<form id="taskForm">
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTitle">Nouvelle tâche</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<input type="hidden" id="taskId">
+					<input type="hidden" id="taskDate">
+
+					<div class="mb-3">
+						<label class="form-label">Pôle</label>
+						<select name="pole" class="form-select" required>
+							{% for pole in poles %}
+								<option value="{{ pole.id }}">{{ pole.nom }}</option>
+							{% endfor %}
+						</select>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Titre</label>
+						<input type="text" class="form-control" name="titre" required>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Description</label>
+						<textarea name="description" id="description" class="form-control" placeholder="Description de la tâche"></textarea>
+					</div>
+
+
+					<div class="mb-3">
+						<label class="form-label">Assigné à</label>
+						<select name="assignerA[]" class="form-select" multiple id="assignesSelect"></select>
+						<small id="assignWarning" class="text-danger d-none mt-1"></small>
+					</div>
+
+
+					<div class="mb-3">
+						<label class="form-label">Importance</label>
+						<select name="importance" class="form-select">
+							<option value="haute">Haute</option>
+							<option value="moyenne" selected>Moyenne</option>
+							<option value="basse">Basse</option>
+						</select>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Heure de début</label>
+						<input type="time" name="heureDebut" class="form-control">
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label">Heure de fin</label>
+						<input type="time" name="heureFin" class="form-control">
+					</div>
+
+
+					<div class="mb-3">
+						<label class="form-label">Deadline</label>
+						<input type="date" name="deadline" class="form-control">
+					</div>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+					<button type="submit" class="btn btn-primary">Enregistrer</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

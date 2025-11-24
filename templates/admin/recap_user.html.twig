@@ -1,0 +1,267 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block page_title %}Planning hebdomadaire par Utilisateur
+{% endblock %}
+{% block content_title %}
+	Récapitulatif de la semaine ({{ startOfWeek|date('d/m') }}
+	→
+	{{ endOfWeek|date('d/m') }})
+{% endblock %}
+
+{% block main %}
+
+	<!-- ===================== FILTRES ========================= -->
+	<div class="card mb-4 shadow-sm">
+		<div class="card-body">
+			<form
+				method="post" action="{{ ea_url().setRoute('admin_planning_recap_users') }}" data-no-turbo class="row g-3">
+
+
+				<!-- Sélection Utilisateur -->
+				<div class="col-md-4">
+					<label class="form-label fw-bold">Utilisateur</label>
+					<select name="user" class="form-select">
+						<option value="">Tous les utilisateurs</option>
+						{% for u in users %}
+							<option value="{{ u.id }}" {{ userFilter == u.id ? 'selected' }}>
+								{{ u.prenom }}
+								{{ u.nom }}
+							</option>
+						{% endfor %}
+					</select>
+				</div>
+
+				<!-- Gestion de la semaine -->
+				<input type="hidden" name="week_offset" value="{{ weekOffset }}" id="weekOffsetUsers">
+
+				<div class="col-md-4 d-flex align-items-end gap-2">
+					<button type="button" class="btn btn-secondary" onclick="changeWeekUsers(-1)">← Semaine précédente</button>
+
+					<button type="button" class="btn btn-secondary" onclick="changeWeekUsers(1)">Semaine suivante →</button>
+				</div>
+
+				<div class="col-md-4 d-flex align-items-end">
+					<button type="submit" class="btn btn-primary w-100">
+						🔍 Filtrer
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<script>
+		function changeWeekUsers(delta) {
+const offsetInput = document.getElementById("weekOffsetUsers");
+offsetInput.value = parseInt(offsetInput.value) + delta;
+offsetInput.form.submit();
+}
+	</script>
+
+	<!-- ===================== CONTENU ========================= -->
+	<h3 class="mt-3">👤 Récap par Utilisateur</h3>
+
+	{% for user in users %}
+		{% if userFilter is empty or userFilter == user.id %}
+
+			<div class="card mt-3 shadow-sm">
+				<div class="card-header bg-dark text-white">
+					<strong>{{ user.prenom }}
+						{{ user.nom }}</strong>
+				</div>
+
+				<div class="card-body">
+
+					{% set liste = taches|filter(t => user in t.assignerA) %}
+					{% set totalMinutes = 0 %}
+
+					{% if liste is empty %}
+						<p class="text-muted">Aucune tâche cette semaine.</p>
+					{% else %}
+						<ul class="list-group">
+							{% for t in liste %}
+								{% set duree = (t.heureFin|date('U') - t.heureDebut|date('U')) / 60 %}
+								{% set totalMinutes = totalMinutes + duree %}
+
+								<li class="list-group-item d-flex justify-content-between align-items-start">
+
+									<div>
+										<strong>{{ t.titre }}</strong><br>
+										📅
+										{{ t.dateExecution|date('D d/m/Y') }}<br>
+										⏰
+										{{ t.heureDebut|date('H:i') }}
+										→
+										{{ t.heureFin|date('H:i') }}
+									</div>
+
+									<!-- ICON DETAILS -->
+									<button class="btn btn-sm btn-outline-primary ms-2 task-details-btn" data-id="{{ t.id }}" data-titre="{{ t.titre }}" data-description="{{ t.description }}" data-date="{{ t.dateExecution|date('Y-m-d') }}" data-debut="{{ t.heureDebut|date('H:i') }}" data-fin="{{ t.heureFin|date('H:i') }}" data-pole="{{ t.pole ? t.pole.nom : 'Non défini' }}" data-importance="{{ t.importance }}" data-deadline="{{ t.deadline ? t.deadline|date('Y-m-d') : '' }}" data-connecte="{{app.user.nom}}" data-createdby="{{user.nom}}" data-assignes="{{ t.assignerA|map(a => a.prenom ~ ' ' ~ a.nom)|join(', ') }}">
+
+										🔍
+									</button>
+
+								</li>
+
+
+							{% endfor %}
+						</ul>
+
+						{% set totalHeures = (totalMinutes / 60)|number_format(2, '.', ' ') %}
+						<div class="alert alert-info mt-3">
+							⏱ Total :
+							<strong>{{ totalHeures }}
+								h</strong>
+							cette semaine
+						</div>
+
+					{% endif %}
+				</div>
+			</div>
+
+		{% endif %}
+	{% endfor %}
+
+
+	<!-- OFFCANVAS DÉTAILS -->
+	<div class="offcanvas offcanvas-end" tabindex="-1" id="taskDetailsPanel">
+		<div class="offcanvas-header bg-primary text-white">
+			<h5 class="offcanvas-title">Détail de la tâche</h5>
+			<button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+		</div>
+
+		<div class="offcanvas-body">
+
+			<h4 id="detailTitre" class="mb-3"></h4>
+			<p id="detailDescription" class="text-muted"></p>
+
+			<ul class="list-group mb-4">
+				<li class="list-group-item">
+					<strong>Date :</strong>
+					<span id="detailDate"></span>
+				</li>
+				<li class="list-group-item">
+					<strong>Horaire :</strong>
+					<span id="detailDebut"></span>
+					→
+					<span id="detailFin"></span>
+				</li>
+				<li class="list-group-item">
+					<strong>Pôle :</strong>
+					<span id="detailPole"></span>
+				</li>
+				<li class="list-group-item">
+					<strong>Importance :</strong>
+					<span id="detailImportance" class="badge"></span>
+				</li>
+				<li class="list-group-item">
+					<strong>Deadline :</strong>
+					<span id="detailDeadline"></span>
+				</li>
+				<li class="list-group-item">
+					<strong>Assignés :</strong>
+					<span id="detailAssignes"></span>
+				</li>
+			</ul>
+
+		</div>
+
+		<div class="offcanvas-footer p-3 border-top">
+			<div class="d-flex justify-content-between">
+				<button class="btn btn-warning" id="detailEditBtn">✏️ Modifier</button>
+				<button class="btn btn-danger" id="detailDeleteBtn">🗑 Supprimer</button>
+			</div>
+
+			<button class="btn btn-secondary mt-3 w-100" data-bs-dismiss="offcanvas">Fermer</button>
+		</div>
+	</div>
+
+
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+
+const panel = new bootstrap.Offcanvas(document.getElementById('taskDetailsPanel'));
+const editBtn = document.getElementById('detailEditBtn');
+const deleteBtn = document.getElementById('detailDeleteBtn');
+
+let currentTaskId = null;
+
+// =========================================================
+// 🔍 OUVERTURE DE L'OFFCANVAS DÉTAILS
+// =========================================================
+document.querySelectorAll('.task-details-btn').forEach(btn => {
+btn.addEventListener('click', () => {
+
+currentTaskId = btn.dataset.id;
+
+// Remplir les infos
+document.getElementById('detailTitre').textContent = btn.dataset.titre;
+document.getElementById('detailDescription').textContent = btn.dataset.description || '—';
+document.getElementById('detailDate').textContent = btn.dataset.date;
+document.getElementById('detailDebut').textContent = btn.dataset.debut;
+document.getElementById('detailFin').textContent = btn.dataset.fin;
+document.getElementById('detailPole').textContent = btn.dataset.pole;
+document.getElementById('detailDeadline').textContent = btn.dataset.deadline || '—';
+document.getElementById('detailAssignes').textContent = btn.dataset.assignes || 'Aucun';
+
+if (btn.dataset.createdBy != btn.dataset.connecte) {
+editBtn.style.display = "none";
+deleteBtn.style.display = "none";
+}
+
+// Importance avec badge couleur
+let imp = btn.dataset.importance;
+
+let badge = document.getElementById('detailImportance');
+badge.textContent = imp;
+
+badge.className = "badge bg-" + (
+imp === 'haute' ? 'danger' : imp === 'moyenne' ? 'warning' : 'success'
+);
+
+// Ouvrir l'Offcanvas
+panel.show();
+});
+});
+
+// =========================================================
+// ✏️ MODIFIER
+// =========================================================
+editBtn.addEventListener('click', () => {
+panel.hide();
+openGlobalTaskEditor(currentTaskId);
+
+
+});
+
+// =========================================================
+// 🗑 SUPPRIMER
+// =========================================================
+deleteBtn.addEventListener('click', async () => {
+if (!confirm('Supprimer définitivement cette tâche ?')) 
+return;
+
+
+
+const url = `{{ path('admin_planning_delete', {'id': 'REPLACE'}) }}`.replace('REPLACE', currentTaskId);
+const res = await fetch(url, {method: 'DELETE'});
+
+if (! res.ok) {
+alert("Erreur lors de la suppression !");
+return;
+}
+
+panel.hide();
+
+// Reload AJAX si dispo
+if (typeof reloadPlanning === "function") {
+await reloadPlanning();
+} else {
+location.reload();
+}
+});
+
+});
+	</script>
+
+
+{% endblock %}

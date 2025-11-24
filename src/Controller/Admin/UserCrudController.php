@@ -5,7 +5,9 @@ namespace App\Controller\Admin;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
@@ -41,6 +43,20 @@ class UserCrudController extends AbstractCrudController
     }
 
 
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->setPermission(Action::NEW, 'ROLE_SUPER_ADMIN')
+            ->setPermission(Action::EDIT, 'ROLE_SUPER_ADMIN')
+            ->setPermission(Action::DELETE, 'ROLE_SUPER_ADMIN')
+            ->setPermission(Action::DETAIL, 'ROLE_SUPER_ADMIN')
+            ->setPermission(Action::BATCH_DELETE, 'ROLE_SUPER_ADMIN')
+        ;
+    }
+
+
+
+
     public function configureFields(string $pageName): iterable
     {
         return [
@@ -48,7 +64,9 @@ class UserCrudController extends AbstractCrudController
             TextField::new('prenom'),
             TextField::new('nom'),
             EmailField::new('email'),
-            TextField::new('password', 'mot de passe')->setFormType(PasswordType::class)->onlyWhenCreating(),
+            TextField::new('password', 'mot de passe')
+                ->setFormType(PasswordType::class)
+                ->onlyWhenCreating(),
             // Champ de vérification du mot de passe
             TextField::new('password_')
                 ->setFormType(PasswordType::class)
@@ -67,6 +85,20 @@ class UserCrudController extends AbstractCrudController
             // ->renderExpanded(), // Affiche des cases à cocher
             SlugField::new('identifiant')->setTargetFieldName(['prenom', 'nom'])->onlyOnForms(),
             TextField::new('identifiant')->hideOnForm(),
+            TextField::new('password_new', 'mot de passe')
+                ->setPermission('ROLE_SUPER_ADMIN')
+                ->setFormType(PasswordType::class)
+                ->onlyWhenUpdating()
+                ->setFormTypeOption('mapped', false),
+            // Champ de vérification du mot de passe
+            TextField::new('password_')
+                ->setPermission('ROLE_SUPER_ADMIN')
+                ->setFormType(PasswordType::class)
+                ->setLabel('Vérification du mot de passe')
+                ->setHelp('Veuillez entrer à nouveau votre mot de passe pour vérification') // 🚨 Ce champ ne sera pas stocké en base de données !
+                ->setFormTypeOption('mapped', false)
+                ->onlyWhenUpdating(),  // Ce champ ne doit pas être mappé à l'entité
+
 
         ];
     }
@@ -93,24 +125,56 @@ class UserCrudController extends AbstractCrudController
         parent::persistEntity($entityManager, $entityInstance);
     }
 
-    public function updatetEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    // public function updatetEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    // {
+    //     if (!$entityInstance instanceof User) {
+    //         return;
+    //     }
+
+    //     // Récupérer le mot de passe du formulaire (qui n'est pas stocké en base)
+    //     $confirmPassword = $this->getContext()->getRequest()->get('User')['password_'];
+
+
+
+
+    //     if ($entityInstance->getPassword() !== $confirmPassword) {
+    //         throw new \RuntimeException('Les mots de passe ne correspondent pas.');
+    //     }
+    //     if ($entityInstance->getPassword()) {
+    //         $hashedPassword = $this->passwordHasher->hashPassword($entityInstance, $entityInstance->getPassword());
+    //         $entityInstance->setPassword($hashedPassword);
+    //     }
+
+    //     parent::updateEntity($entityManager, $entityInstance);
+    // }
+
+    public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         if (!$entityInstance instanceof User) {
             return;
         }
 
-        // Récupérer le mot de passe du formulaire (qui n'est pas stocké en base)
-        $confirmPassword = $this->getContext()->getRequest()->get('confirmPassword');
+        // Récupérer les données du formulaire
+        $password = $this->getContext()->getRequest()->get('User')['password_new'];
 
-        if ($entityInstance->getPassword() !== $confirmPassword) {
+        $password_ = $this->getContext()->getRequest()->get('User')['password_'];
+
+
+        // Si rien n’est rempli → on ne change pas le mot de passe
+        if (!$password) {
+            parent::updateEntity($entityManager, $entityInstance);
+            return;
+        }
+
+        // Vérification
+        if ($password !== $password_) {
             throw new \RuntimeException('Les mots de passe ne correspondent pas.');
         }
 
-        if ($entityInstance->getPassword()) {
-            $hashedPassword = $this->passwordHasher->hashPassword($entityInstance, $entityInstance->getPassword());
-            $entityInstance->setPassword($hashedPassword);
-        }
+        // Hash
+        $hashedPassword = $this->passwordHasher->hashPassword($entityInstance, $password);
+        $entityInstance->setPassword($hashedPassword);
 
-        parent::persistEntity($entityManager, $entityInstance);
+        parent::updateEntity($entityManager, $entityInstance);
     }
 }

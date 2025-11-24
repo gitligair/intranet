@@ -42,9 +42,19 @@ class Poles
     #[ORM\ManyToOne(inversedBy: 'poles')]
     private ?Processus $processus = null;
 
+    #[ORM\ManyToOne(inversedBy: 'responsable_pole')]
+    private ?User $responsable = null;
+
+    /**
+     * @var Collection<int, Tache>
+     */
+    #[ORM\OneToMany(targetEntity: Tache::class, mappedBy: 'pole')]
+    private Collection $taches;
+
     public function __construct()
     {
         $this->personnel = new ArrayCollection();
+        $this->taches = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -150,5 +160,47 @@ class Poles
     public function __toString(): string
     {
         return strtoupper($this->nom);
+    }
+
+    public function getResponsable(): ?User
+    {
+        return $this->responsable;
+    }
+
+    public function setResponsable(?User $responsable): static
+    {
+        $this->responsable = $responsable;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Tache>
+     */
+    public function getTaches(): Collection
+    {
+        return $this->taches;
+    }
+
+    public function addTach(Tache $tach): static
+    {
+        if (!$this->taches->contains($tach)) {
+            $this->taches->add($tach);
+            $tach->setPole($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTach(Tache $tach): static
+    {
+        if ($this->taches->removeElement($tach)) {
+            // set the owning side to null (unless already changed)
+            if ($tach->getPole() === $this) {
+                $tach->setPole(null);
+            }
+        }
+
+        return $this;
     }
 }

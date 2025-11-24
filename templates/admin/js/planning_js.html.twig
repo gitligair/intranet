@@ -1,0 +1,481 @@
+<script>
+	const CURRENT_USER_ID = {{ app.user.id }};
+
+async function changeWeek(delta) {
+const input = document.getElementById('weekOffset');
+const newOffset = parseInt(input.value) + delta;
+input.value = newOffset;
+
+const url = "/admin/planning/timeline/week?week_offset=" + newOffset;
+
+const res = await fetch(url);
+const html = await res.text();
+
+// Remplacer uniquement la partie timeline
+const container = document.getElementById('timeline_container');
+container.innerHTML = html;
+
+// Réinitialiser tous les events JS (modal, hover, clic…)
+initPlanningEvents();
+}
+
+
+// 🧩 Affichage des alertes Bootstrap
+function showAlert(message, type = 'success') {
+const container = document.getElementById('alert-container');
+const alert = document.createElement('div');
+
+alert.className = `alert alert-${type} alert-dismissible fade show shadow-lg`;
+alert.style.marginBottom = "10px";
+alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+container.appendChild(alert);
+
+// disparition automatique
+setTimeout(() => {
+const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+bsAlert.close();
+}, 4000);
+}
+
+
+// 🔁 Recharge dynamique du planning
+async function reloadPlanning() {
+const container = document.getElementById('planning_container');
+const res = await fetch('{{ path("admin_planning_partial") }}');
+const html = await res.text();
+container.innerHTML = html;
+initPlanningEvents(); // Réattache les events
+}
+
+// 🔧 Initialisation globale
+function initPlanningEvents() {
+
+const modal = new bootstrap.Modal(document.getElementById('taskModal'));
+const form = document.getElementById('taskForm');
+
+const modalTitle = document.getElementById('modalTitle');
+const taskIdInput = document.getElementById('taskId');
+const taskDateInput = document.getElementById('taskDate');
+
+const poleSelect = form.querySelector('[name="pole"]');
+const assignSelect = document.getElementById('assignesSelect');
+const warning = document.getElementById('assignWarning');
+
+// 📝 Hover modern sur une tâche
+document.querySelectorAll('.task-block-h').forEach(task => {
+let tooltip;
+
+task.addEventListener('mouseenter', () => {
+tooltip = document.createElement('div');
+tooltip.className = "task-tooltip";
+tooltip.innerHTML = `
+            <strong>${
+task.dataset.titre
+}</strong><br>
+            ${
+task.dataset.debut
+} → ${
+task.dataset.fin
+}<br>
+            <small>Pôle : ${
+task.dataset.pole
+}</small><br>
+            <small>Importance : ${
+task.dataset.importance
+}</small><br>
+            <small>Assignés : ${
+task.dataset.usersnames || "—"
+}</small>
+        `;
+document.body.appendChild(tooltip);
+});
+
+task.addEventListener('mousemove', e => {
+if (! tooltip) 
+return;
+
+
+
+tooltip.style.left = (e.pageX + 15) + "px";
+tooltip.style.top = (e.pageY + 15) + "px";
+});
+
+task.addEventListener('mouseleave', () => {
+tooltip ?. remove();
+tooltip = null;
+});
+});
+
+
+// 📌 Clic sur une case vide → créer une tâche
+document.querySelectorAll('.timeline-cell').forEach(cell => { // Empêcher clic sur une tâche
+cell.addEventListener('click', e => {
+if (e.target.closest('.task-block-h')) 
+return;
+
+
+
+const date = cell.dataset.date;
+const userId = cell.dataset.user;
+
+// Approximation de l'heure selon position dans la case
+const rect = cell.getBoundingClientRect();
+const clickX = e.clientX - rect.left;
+const percent = clickX / rect.width;
+const minutes = Math.round(percent * 1440); // journée = 1440 min
+
+let h = Math.floor(minutes / 60);
+let m = minutes % 60;
+if (h < 8) 
+h = 8;
+
+
+
+if (h > 18) 
+h = 18;
+
+
+
+const horaireDebut = `${
+String(h).padStart(2, '0')
+}:${
+String(m).padStart(2, '0')
+}`;
+
+// Préparer le modal
+const form = document.getElementById("taskForm");
+const modal = new bootstrap.Modal(document.getElementById("taskModal"));
+
+form.reset();
+document.getElementById('taskId').value = "";
+document.getElementById('taskDate').value = date;
+
+// Remplir l’heure automatiquement
+form.querySelector('[name="heureDebut"]').value = horaireDebut;
+
+// Sélectionner automatiquement l'utilisateur dans assignés
+const select = document.getElementById('assignesSelect');
+const opt = select.querySelector(`option[value="${userId}"]`);
+if (opt) 
+opt.selected = true;
+
+
+
+document.getElementById("modalTitle").textContent = "Nouvelle tâche";
+
+modal.show();
+});
+});
+
+
+// 🔄 Charger les utilisateurs d’un pôle
+async function loadUsersForPole(poleId) {
+const res = await fetch('{{ path("admin_planning_users_by_pole") }}', {
+method: 'POST',
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify(
+{pole_id: poleId}
+)
+});
+
+const json = await res.json();
+assignSelect.innerHTML = ''; // Vider
+
+if (json.users) {
+json.users.forEach(u => {
+const opt = document.createElement('option');
+opt.value = u.id;
+opt.textContent = u.name;
+assignSelect.appendChild(opt);
+});
+}
+}
+
+// ➕ Ajouter une tâche
+document.querySelectorAll('.add-task-btn').forEach(btn => {
+btn.addEventListener('click', async () => {
+modalTitle.textContent = 'Nouvelle tâche';
+form.reset();
+taskIdInput.value = '';
+taskDateInput.value = btn.dataset.date;
+
+await loadUsersForPole(poleSelect.value);
+
+modal.show();
+});
+});
+
+// ✏️ Modifier une tâche
+document.querySelectorAll('.edit-task-btn').forEach(btn => {
+btn.addEventListener('click', async () => {
+
+modalTitle.textContent = 'Modifier la tâche';
+
+taskIdInput.value = btn.dataset.id;
+taskDateInput.value = btn.dataset.dateexecution;
+
+// Champs principaux
+form.querySelector('[name="titre"]').value = btn.dataset.titre || '';
+form.querySelector('[name="description"]').value = btn.dataset.description || '';
+form.querySelector('[name="importance"]').value = btn.dataset.importance || '';
+form.querySelector('[name="deadline"]').value = btn.dataset.deadline || '';
+
+// Heures
+form.querySelector('[name="heureDebut"]').value = btn.dataset.heuredebut || '';
+form.querySelector('[name="heureFin"]').value = btn.dataset.heurefin || '';
+
+// Pôle
+const poleId = btn.dataset.pole;
+poleSelect.value = poleId;
+
+// Charger les utilisateurs du pôle AVANT de cocher les assignés
+await loadUsersForPole(poleId);
+
+// Pré-sélectionner les assignés
+const assigned = btn.dataset.assignera ? btn.dataset.assignera.split(',') : [];
+
+assigned.forEach(userId => {
+const opt = assignSelect.querySelector(`option[value="${userId}"]`);
+if (opt) 
+opt.selected = true;
+
+
+
+});
+
+modal.show();
+});
+});
+
+// 🗑️ Supprimer
+document.querySelectorAll('.delete-task-btn').forEach(btn => {
+btn.addEventListener('click', async () => {
+if (!confirm('Supprimer cette tâche ?')) 
+return;
+
+
+
+const id = btn.dataset.id;
+const url = `{{ path('admin_planning_delete', {'id': 'REPLACE'}) }}`.replace('REPLACE', id);
+
+const res = await fetch(url, {method: 'DELETE'});
+var json = await res.json();
+
+
+if (res.ok) {
+showAlert('Tâche supprimée avec succès ✅', 'success');
+await reloadPlanning();
+} else {
+modal.hide("slow");
+
+showAlert(json.message ?? 'Erreur inconnue 🚫', 'danger');
+
+}
+});
+});
+
+// 💾 Soumission AJAX (création / édition)
+form.onsubmit = async (e) => {
+e.preventDefault();
+
+const id = taskIdInput.value;
+
+const data = {
+pole_id: poleSelect.value,
+titre: form.querySelector('[name="titre"]').value,
+description: form.querySelector('[name="description"]').value,
+
+importance: form.querySelector('[name="importance"]').value,
+deadline: form.querySelector('[name="deadline"]').value,
+date: taskDateInput.value,
+assignes: Array.from(assignSelect.selectedOptions).map(opt => opt.value),
+heureDebut: form.querySelector('[name="heureDebut"]').value,
+heureFin: form.querySelector('[name="heureFin"]').value
+};
+
+const url = id ? `{{ path('admin_planning_update', {'id': 'REPLACE'}) }}`.replace('REPLACE', id) : `{{ path('admin_planning_save') }}`;
+
+const res = await fetch(url, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(data)
+});
+var json = await res.json();
+
+if (res.ok) {
+modal.hide();
+showAlert(id ? 'Tâche mise à jour avec succès ✅' : 'Tâche ajoutée avec succès ✅', 'success');
+await reloadPlanning();
+} else {
+modal.hide("slow");
+
+showAlert(json.message ?? 'Erreur inconnue 🚫', 'danger');
+
+
+}
+};
+
+
+// 🕒 Vérification des disponibilités assignés
+async function checkDisponibilites() {
+const date = taskDateInput.value;
+const heureDebut = form.querySelector('[name="heureDebut"]').value;
+const heureFin = form.querySelector('[name="heureFin"]').value;
+const assignes = Array.from(assignSelect.selectedOptions).map(opt => opt.value);
+
+if (! date || ! heureDebut || ! heureFin || assignes.length === 0) 
+return;
+
+
+
+const res = await fetch('{{ path("admin_planning_check_dispo") }}', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(
+{date, heureDebut, heureFin, assignes}
+)
+});
+
+var json = await res.json();
+
+// Réinitialiser tous les styles
+assignSelect.querySelectorAll('option').forEach(opt => {
+opt.style.color = '';
+opt.style.backgroundColor = '';
+});
+
+if (json.conflicts.length > 0) { // Texte d’alerte
+warning.classList.remove('d-none');
+warning.innerHTML = `⚠️ Conflits : ${
+json.conflicts.map(c => c.user).join(', ')
+}`;
+
+assignSelect.classList.add('is-invalid');
+
+// Coloration des utilisateurs en conflit
+json.conflicts.forEach(c => {
+const opt = assignSelect.querySelector(`option[value="${
+c.user_id
+}"]`);
+if (opt) {
+opt.style.color = 'white';
+opt.style.backgroundColor = '#dc3545'; // rouge bootstrap
+}
+});
+
+} else {
+warning.classList.add('d-none');
+warning.innerHTML = '';
+assignSelect.classList.remove('is-invalid');
+}
+}
+
+// Vérification live
+['change', 'blur'].forEach(evt => {
+assignSelect.addEventListener(evt, checkDisponibilites);
+form.querySelector('[name="heureDebut"]').addEventListener(evt, checkDisponibilites);
+form.querySelector('[name="heureFin"]').addEventListener(evt, checkDisponibilites);
+});
+
+// Charger la liste d’utilisateurs au changement de pôle
+poleSelect.addEventListener('change', () => {
+loadUsersForPole(poleSelect.value);
+});
+}
+
+async function initTaskViewModal() {
+const modalEl = document.getElementById('taskViewModal');
+if (! modalEl) 
+return;
+
+
+
+// Modal non présent = on ignore
+
+const modal = new bootstrap.Modal(modalEl);
+
+document.querySelectorAll('.task-block-h').forEach(task => {
+task.addEventListener('click', () => { // Sécurisation lookup DOM
+const safe = id => document.getElementById(id) ?? {
+textContent: "",
+innerHTML: ""
+};
+
+safe('viewTitre').textContent = task.dataset.titre || "—";
+safe('viewDescription').textContent = task.dataset.description || "—";
+safe('viewPole').textContent = task.dataset.pole || "—";
+
+safe('viewHoraire').textContent = `${
+task.dataset.debut
+} → ${
+task.dataset.fin
+}`;
+
+safe('viewDeadline').textContent = task.dataset.deadline || "Aucune";
+safe('viewImportance').textContent = task.dataset.importance ?. toUpperCase() || "—";
+
+const names = task.dataset.usersnames || "";
+safe('viewAssignes').innerHTML = names.split(',').filter(n => n.length > 0).map(n => `<span class="badge bg-secondary me-1">${n}</span>`).join('');
+
+const createdBy = task.dataset.createdby;
+
+// Boutons
+const editBtn = document.getElementById('viewEditBtn');
+const deleteBtn = document.getElementById('viewDeleteBtn');
+
+// ⚡ On affiche seulement si user = créateur
+if (parseInt(createdBy) === CURRENT_USER_ID) {
+editBtn.classList.remove('d-none');
+deleteBtn.classList.remove('d-none');
+} else {
+editBtn.classList.add('d-none');
+deleteBtn.classList.add('d-none');
+}
+// 🔧 Bouton Modifier → ouvre le modal d'édition
+editBtn.onclick = () => {
+modal.hide();
+console.log(task.dataset);
+// on clique sur le bouton d'édition correspondant à CETTE tâche
+const realBtn = document.querySelector(`.edit-task-btn[data-id="${
+task.dataset.id
+}"]`);
+
+if (realBtn) {
+console.log("→ Ouverture modal édition pour la tâche :", task.dataset);
+realBtn.click();
+} else {
+console.error("❌ Bouton .edit-task-btn introuvable pour l'id :", task.dataset.id);
+}
+};
+
+
+// 🔥 Bouton Supprimer → clique sur le vrai bouton delete
+deleteBtn.onclick = () => {
+modal.hide();
+document.querySelector(`.delete-task-btn[data-id="${
+task.dataset.id
+}"]`).click();
+};
+modal.show();
+});
+});
+}
+
+// 🚀 Initialisation
+document.addEventListener('DOMContentLoaded', () => {
+initPlanningEvents();
+initTaskViewModal();
+
+
+});
+</script>

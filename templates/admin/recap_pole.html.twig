@@ -1,0 +1,88 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block page_title %}Planning hebdomadaire par POLE
+{% endblock %}
+{% block main %}
+
+	<div class="card mb-3">
+		<div class="card-body">
+			<form
+				method="post" action="{{ ea_url().setRoute('admin_planning_recap_poles') }}" data-no-turbo class="row g-3">
+
+
+				<!-- FILTRE POLE -->
+				<div class="col-md-4">
+					<label class="form-label">Choisir un pôle</label>
+					<select name="pole" class="form-select">
+						<option value="">Tous les pôles</option>
+						{% for pole in poles %}
+							<option value="{{ pole.id }}" {{ poleFilter == pole.id ? 'selected' }}>
+								{{ pole.nom }}
+							</option>
+						{% endfor %}
+					</select>
+				</div>
+
+				<!-- FILTRE SEMAINE -->
+				<input type="hidden" name="week_offset" value="{{ weekOffset }}" id="weekOffset">
+
+				<div class="col-md-4 d-flex align-items-end gap-2">
+					<button type="button" class="btn btn-secondary" onclick="changeWeek(-1)">← Semaine précédente</button>
+
+					<button type="button" class="btn btn-secondary" onclick="changeWeek(1)">Semaine suivante →</button>
+				</div>
+
+				<div class="col-md-4 d-flex align-items-end">
+					<button type="submit" class="btn btn-primary w-100">🔍 Filtrer</button>
+				</div>
+
+			</form>
+		</div>
+	</div>
+
+	<script>
+		function changeWeek(delta) {
+const offset = document.getElementById("weekOffset");
+offset.value = parseInt(offset.value) + delta;
+offset.form.submit();
+}
+	</script>
+
+	<h3 class="mt-4">
+		Semaine du
+		{{ startOfWeek|date('d/m') }}
+		au
+		{{ endOfWeek|date('d/m') }}
+	</h3>
+
+	{% for pole in poles %}
+		{% if poleFilter is empty or poleFilter == pole.id %}
+
+			<div class="card mt-3">
+				<div class="card-header bg-primary text-white">
+					{{ pole.nom }}
+				</div>
+				<div class="card-body">
+					{% set liste = taches|filter(t => t.pole.id == pole.id) %}
+
+					{% if liste is empty %}
+						<p class="text-muted">Aucune tâche.</p>
+					{% else %}
+						<ul class="list-group">
+							{% for t in liste %}
+								<li class="list-group-item">
+									<strong>{{ t.titre }}</strong>
+									—
+									{{ t.dateExecution|date('d/m') }}
+									({{ t.heureDebut|date('H:i') }}→{{ t.heureFin|date('H:i') }})
+								</li>
+							{% endfor %}
+						</ul>
+					{% endif %}
+				</div>
+			</div>
+
+		{% endif %}
+	{% endfor %}
+
+{% endblock %}

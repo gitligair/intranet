@@ -9,14 +9,20 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Form\CotechVacarmMaterielDetailType;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 
@@ -24,7 +30,7 @@ class CotechVacarmMaterielCrudController extends AbstractCrudController
 {
     private $em;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em, private AdminUrlGenerator $adminUrlGenerator)
     {
         $this->em = $em;
     }
@@ -42,7 +48,33 @@ class CotechVacarmMaterielCrudController extends AbstractCrudController
         // ->setEntityPermission('ROLE_SUPER_ADMIN');
     }
 
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->setPermission(Action::NEW, 'ROLE_SUPER_ADMIN')
+            ->setPermission(Action::EDIT, 'ROLE_SUPER_ADMIN')
+            ->setPermission(Action::DELETE, 'ROLE_SUPER_ADMIN')
+            ->setPermission(Action::DETAIL, 'ROLE_SUPER_ADMIN')
+            ->setPermission(Action::BATCH_DELETE, 'ROLE_SUPER_ADMIN')
+        ;
+    }
 
+    public function detail(AdminContext $context)
+    {
+        if (!$this->isGranted('ROLE_SUPER_ADMIN')) {
+            $this->addFlash('warning', 'Vous n\'avez pas les permissions nécessaires.');
+            // Redirection vers la liste de ce même CRUD
+            // Construire l'URL vers l'index du CRUD courant
+            $url = $this->adminUrlGenerator
+                ->setController(static::class)
+                ->setAction('index')
+                ->generateUrl();
+
+            return new RedirectResponse($url);
+        }
+
+        return parent::detail($context);
+    }
 
     public function configureFields(string $pageName): iterable
     {
@@ -86,6 +118,10 @@ class CotechVacarmMaterielCrudController extends AbstractCrudController
                     'allow_delete' => true,
                     'prototype' => true,
                 ])
+                ->onlyOnForms(),
+            CollectionField::new('bds', 'Bases de données')
+                ->setTemplatePath('admin/fields/bds_table.html.twig')
+                ->onlyOnDetail(),
         ];
     }
 }

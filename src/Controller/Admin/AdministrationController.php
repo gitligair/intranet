@@ -15,8 +15,10 @@ use App\Entity\TypeMateriel;
 use App\Entity\Petitmateriel;
 use App\Entity\CotechVacarmMateriel;
 use Symfony\Component\HttpFoundation\Response;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Security\Permission;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 
@@ -38,10 +40,23 @@ class AdministrationController extends AbstractDashboardController
         ;
     }
 
+
+
+    public function configureAssets(): Assets
+    {
+        return Assets::new()
+            ->addCssFile('css/easyadmin-custom.css');
+    }
+
     public function configureMenuItems(): iterable
     {
         return [
-            MenuItem::linkToDashboard('Dashboard', 'fa fa-home'),
+            MenuItem::linkToDashboard('Tableau de bord', 'fa fa-home'),
+            MenuItem::section('Organisation'),
+            MenuItem::linkToRoute('Planning hebdomadaire', 'fa fa-calendar-week', 'admin_planning'),
+            MenuItem::linkToRoute('Planning par personne', 'fa fa-user', 'admin_planning_grille'),
+            MenuItem::linkToRoute('📊 Planning par pôle', 'fa fa-building', 'admin_planning_recap_poles'),
+
 
             MenuItem::section('Systeme qualité'),
             MenuItem::linkToCrud('Processus', 'fa-solid fa-microchip', Processus::class),

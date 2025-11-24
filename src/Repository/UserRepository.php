@@ -33,6 +33,21 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+    public function truncate(): void
+    {
+        $connection = $this->getEntityManager()->getConnection();
+        $platform = $connection->getDatabasePlatform();
+
+        // Désactiver temporairement la vérification des clés étrangères
+        $connection->executeStatement('SET FOREIGN_KEY_CHECKS=0');
+
+        // Générer la requête TRUNCATE pour la table User
+        $connection->executeStatement($platform->getTruncateTableSQL('user', true));
+
+        // Réactiver la vérification
+        $connection->executeStatement('SET FOREIGN_KEY_CHECKS=1');
+    }
+
     //    /**
     //     * @return User[] Returns an array of User objects
     //     */
