@@ -7,7 +7,9 @@ use App\Entity\User;
 use App\Entity\Poles;
 use App\Entity\Tache;
 use App\Repository\TacheRepository;
+use App\Services\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -137,7 +139,7 @@ class PlanningAgileController extends AbstractController
 
 
     #[Route('/save', name: 'admin_planning_save', methods: ['POST'])]
-    public function save(Request $request, EntityManagerInterface $em): JsonResponse
+    public function save(Request $request, EntityManagerInterface $em, NotificationService $notifier, AdminUrlGenerator $adminUrlGenerator): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -196,6 +198,29 @@ class PlanningAgileController extends AbstractController
 
             $em->persist($tache);
             $em->flush();
+
+
+            $url = $adminUrlGenerator
+                ->setController('App\Controller\Admin\TacheCrudController')
+                ->setAction('detail')
+                ->setEntityId($tache->getId())
+                ->generateUrl();
+            // ... après avoir persisté/flush la Tache $tache
+            foreach ($tache->getAssignerA() as $user) {
+                $notifier->notifyUser(
+                    $user,
+                    'Nouvelle tâche : ' . $tache->getTitre(),
+                    sprintf(
+                        '%s — %s → %s',
+                        $tache->getDateExecution()?->format('Y-m-d'),
+                        $tache->getHeureDebut()?->format('H:i'),
+                        $tache->getHeureFin()?->format('H:i'),
+                        $tache->getCreatedBy()
+                    ),
+                    $url,
+                    ['taskId' => $tache->getId(), 'importance' => $tache->getImportance()]
+                );
+            }
 
             return new JsonResponse([
                 'message' => 'Tâche enregistrée',

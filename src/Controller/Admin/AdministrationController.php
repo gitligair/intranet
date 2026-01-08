@@ -2,17 +2,22 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Os;
 use App\Entity\User;
 use App\Entity\Ecran;
 use App\Entity\Poles;
 use App\Entity\Bureau;
 use App\Entity\Materiel;
 use App\Entity\Services;
+use App\Entity\Categorie;
 use App\Entity\Processus;
+use App\Entity\Accessoire;
 use App\Entity\Ordinateur;
+use App\Entity\TaillePouce;
 use App\Entity\CotechVacarm;
 use App\Entity\TypeMateriel;
 use App\Entity\Petitmateriel;
+use App\Entity\SousCategorie;
 use App\Entity\CotechVacarmMateriel;
 use Symfony\Component\HttpFoundation\Response;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
@@ -34,7 +39,8 @@ class AdministrationController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Intranet LIG\'AIR')
+            ->setTitle('<h5 class="text-white fst-italic ">Intranet LIG\'AIR</h5>')
+
             ->setFaviconPath('images/logos/ligair.svg')
 
         ;
@@ -45,7 +51,11 @@ class AdministrationController extends AbstractDashboardController
     public function configureAssets(): Assets
     {
         return Assets::new()
-            ->addCssFile('css/easyadmin-custom.css');
+            // ->addWebpackEncoreEntry('app') // ← crucial
+
+            ->addCssFile('css/easyadmin-custom.css')
+            ->addCssFile('css/ea-notification.css') // si tu as aussi le style
+            ->addJsFile('js/planning/ea-notification.js');
     }
 
     public function configureMenuItems(): iterable
@@ -72,11 +82,18 @@ class AdministrationController extends AbstractDashboardController
                 MenuItem::linkToCrud('Types de matériel', 'fa-solid fa-box', TypeMateriel::class),
             ]),
 
-            MenuItem::section('Matériels'),
+            MenuItem::section('Matériels informatiques'),
+            MenuItem::subMenu('Désignations', 'fa-brands fa-typo3')->setSubItems([
+                MenuItem::linkToCrud('Catégories', 'fa-solid fa-box', Categorie::class),
+                MenuItem::linkToCrud('Sous-catégories', 'fa-solid fa-box', SousCategorie::class),
+                MenuItem::linkToCrud('Tailles en pouces', 'fa-solid fa-box', TaillePouce::class),
+                MenuItem::linkToCrud('Systemes d\'exploitation', 'fa-solid fa-box', Os::class),
+            ]),
             MenuItem::linkToCrud('Tous matériels', 'fa-solid fa-box', Materiel::class),
             MenuItem::linkToCrud('Ecrans', 'fa-solid fa-window-maximize', Ecran::class),
             MenuItem::linkToCrud('Ordinateurs', 'fa-solid fa-desktop', Ordinateur::class),
             MenuItem::linkToCrud('Autres materiels', 'fa-brands fa-usb', Petitmateriel::class),
+            MenuItem::linkToCrud('Accessoires', 'fa-brands fa-usb', Accessoire::class),
 
             MenuItem::section('Coteech VACARM'),
             MenuItem::linkToCrud('COTECH VACARM', 'fa-solid fa-gears', CotechVacarm::class),

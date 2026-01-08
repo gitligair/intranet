@@ -1,85 +1,74 @@
-/* -------------------------------------------------------
-   🌟 THEME EASYADMIN PREMIUM - TURQUOISE / SKY BLUE
-   Design SaaS professionnel
-   ------------------------------------------------------- */
-
 :root {
-    --color-primary: #48D7D0;
-    --color-primary-dark: #34b8b2;
-    --color-accent: #6ED6FF;
-    --color-bg: #f7fbfd;
+    --color-primary: #3BB4AA;
+    --color-primary-dark: #2C9E96;
+    --color-accent: #5CC4E0;
+    --color-bg: #f8fafa;
     --color-bg-card: #ffffff;
     --color-bg-sidebar: #0F2A43;
-    --color-bg-sidebar-hover: rgba(255, 255, 255, 0.08);
+    --color-bg-sidebar-hover: rgba(255, 255, 255, 0.1);
     --color-text: #1a2e3b;
-    --color-text-light: #e4faff;
-    --radius: 12px;
-    --shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-    --shadow-hover: 0 6px 26px rgba(0, 0, 0, 0.14);
-    --transition: 0.22s cubic-bezier(.25, .8, .25, 1);
+    --color-text-light: #ffffff;
+    --radius: 10px;
+    --shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --transition: 0.2s ease;
 }
 
-/* GLOBAL -------------------------------------- */
-
+/* GLOBAL */
 body,
 .content-body {
     background: var(--color-bg) !important;
     font-family: 'Inter', sans-serif !important;
+    font-size: 15px;
     color: var(--color-text) !important;
 }
 
-/* HEADERS ------------------------------------- */
-
+/* HEADER */
 .content-header-title {
-    font-size: 1.9rem !important;
-    font-weight: 700 !important;
-    color: var(--color-primary) !important;
-    letter-spacing: -0.5px;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
 }
 
-/* SIDEBAR ------------------------------------- */
-
+/* SIDEBAR */
 .sidebar {
     background: var(--color-bg-sidebar) !important;
-    border-right: none !important;
-    padding-top: 1.4rem !important;
+    padding-top: 1.4rem;
 }
 
 .sidebar .menu-section {
-    color: var(--color-text-light) !important;
-    opacity: 0.8;
-    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
     font-size: 0.75rem;
-    margin-top: 1.2rem !important;
-    margin-bottom: 0.4rem !important;
-    padding-left: 18px;
+    text-transform: uppercase;
+    padding-left: 1rem;
+    margin-top: 1.2rem;
+    margin-bottom: 0.4rem;
 }
 
 .sidebar .menu-item a {
-    color: var(--color-text-light) !important;
-    font-weight: 500;
+    color: #ffffff !important;
     border-radius: var(--radius);
-    transition: var(--transition);
     padding: 10px 16px;
+    font-weight: 500;
+    transition: var(--transition);
 }
 
 .sidebar .menu-item a:hover {
-    background: var(--color-bg-sidebar-hover) !important;
+    background: var(--color-bg-sidebar-hover);
     color: var(--color-accent) !important;
 }
 
 .sidebar .menu-item.active>a {
-    background: rgba(255, 255, 255, 0.14) !important;
+    background: rgba(255, 255, 255, 0.14);
     color: var(--color-primary) !important;
-    font-weight: 600;
 }
 
-/* CARDS --------------------------------------- */
-
+/* CARDS */
 .card {
-    border-radius: var(--radius) !important;
-    border: none !important;
-    background: var(--color-bg-card) !important;
+    background: var(--color-bg-card);
+    border: none;
+    border-radius: var(--radius);
     box-shadow: var(--shadow);
     transition: var(--transition);
 }
@@ -88,45 +77,45 @@ body,
     box-shadow: var(--shadow-hover);
 }
 
-/* BUTTONS ------------------------------------- */
-
+/* BUTTONS */
 .btn,
 .ea-button {
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-    padding: 0.55rem 1.2rem !important;
-    border: 2px solid blue !important;
+    border: none !important;
+    padding: 2px 8px !important;
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 0.5rem 1.2rem;
     transition: var(--transition);
 }
 
 .btn-primary,
 .ea-button--primary {
-    background: var(--color-primary) !important;
-    color: #0F2A43 !important;
+    background: var(--color-primary);
+    color: #fff;
 }
 
 .btn-primary:hover,
 .ea-button--primary:hover {
-    background: var(--color-primary-dark) !important;
+    background: var(--color-primary-dark);
 }
 
-/* SECONDARY */
-.btn-secondary {
-    background: var(--color-accent) !important;
-    color: #0F2A43 !important;
+.btn-secondary,
+.ea-button--secondary {
+    background: var(--color-accent);
+    color: #fff;
 }
 
-.btn-secondary:hover {
-    background: #5ccaf3 !important;
+.btn-secondary:hover,
+.ea-button--secondary:hover {
+    background: #4ab2d0;
 }
 
-/* TABLES -------------------------------------- */
-
+/* TABLES */
 .datagrid thead th {
-    background: #f0fbff !important;
-    color: #0F2A43 !important;
-    font-weight: 700 !important;
-    border-bottom: 2px solid var(--color-accent) !important;
+    background: #eef6f9;
+    color: #0F2A43;
+    font-weight: 600;
+    border-bottom: 2px solid var(--color-accent);
 }
 
 .datagrid tbody tr {
@@ -134,66 +123,74 @@ body,
 }
 
 .datagrid tbody tr:hover {
-    background: rgba(110, 214, 255, 0.15) !important;
+    background: rgba(92, 196, 224, 0.1);
 }
 
-/* FORMS --------------------------------------- */
-
+/* FORMS */
 form input,
 form select,
 form textarea {
-    border-radius: 10px !important;
-    border: 1px solid #d6eef7 !important;
-    background: #ffffff !important;
+    border-radius: 8px;
+    border: 1px solid #d0e4ec;
+    background: #ffffff;
     transition: var(--transition);
+    padding: 0.5rem 0.8rem;
 }
 
 form input:focus,
 form select:focus,
 form textarea:focus {
-    border-color: var(--color-accent) !important;
-    box-shadow: 0 0 0 0.15rem rgba(110, 214, 255, 0.35) !important;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 0.15rem rgba(92, 196, 224, 0.25);
 }
 
-/* LABELS */
 form label {
-    font-weight: 600 !important;
-    color: #0F2A43 !important;
+    font-weight: 500;
+    color: #0F2A43;
 }
 
-/* PAGINATION ---------------------------------- */
-
+/* PAGINATION */
 .page-item.active .page-link {
-    background: var(--color-primary) !important;
-    border-color: var(--color-primary) !important;
-    color: #0F2A43 !important;
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
 }
 
 .page-link {
-    color: var(--color-primary) !important;
+    color: var(--color-primary);
     border-radius: 6px;
 }
 
-/* FLASH MESSAGES ------------------------------- */
-
+/* FLASH MESSAGES */
 .alert {
-    border: none !important;
-    border-radius: var(--radius) !important;
+    border: none;
+    border-radius: var(--radius);
     box-shadow: var(--shadow);
 }
 
 .alert-success {
-    background: #dfffef !important;
-    color: #056b3b !important;
+    background: #dffef2;
+    color: #056b3b;
 }
 
 .alert-danger {
-    background: #ffe4e4 !important;
-    color: #9e1c1c !important;
+    background: #ffe6e6;
+    color: #9e1c1c;
 }
 
 .alert-info {
-    background: #e0f7ff !important;
-    color: #0c4b66 !important;
+    background: #e4f7ff;
+    color: #07506d;
 }
 
+#ea-notif-button {
+    font-size: 1.2rem;
+    color: var(--color-primary);
+    position: relative;
+}
+
+#ea-notif-badge {
+    font-size: 0.65rem;
+    background: red;
+    padding: 4px 6px;
+}

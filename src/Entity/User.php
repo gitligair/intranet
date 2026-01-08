@@ -114,6 +114,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Tache::class, mappedBy: 'createdBy')]
     private Collection $tachesCrees;
 
+    /**
+     * @var Collection<int, Notification>
+     */
+    #[ORM\OneToMany(targetEntity: Notification::class, mappedBy: 'userAssigne')]
+    private Collection $notifications;
+
+    /**
+     * @var Collection<int, Accessoire>
+     */
+    #[ORM\ManyToMany(targetEntity: Accessoire::class, mappedBy: 'listeAlloues')]
+    private Collection $accessoires;
+
 
     public function __construct()
     {
@@ -125,6 +137,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->taches = new ArrayCollection();
         $this->processuses = new ArrayCollection();
         $this->tachesCrees = new ArrayCollection();
+        $this->notifications = new ArrayCollection();
+        $this->accessoires = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -509,6 +523,63 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             if ($tachesCree->getCreatedBy() === $this) {
                 $tachesCree->setCreatedBy(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Notification>
+     */
+    public function getNotifications(): Collection
+    {
+        return $this->notifications;
+    }
+
+    public function addNotification(Notification $notification): static
+    {
+        if (!$this->notifications->contains($notification)) {
+            $this->notifications->add($notification);
+            $notification->setUserAssigne($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNotification(Notification $notification): static
+    {
+        if ($this->notifications->removeElement($notification)) {
+            // set the owning side to null (unless already changed)
+            if ($notification->getUserAssigne() === $this) {
+                $notification->setUserAssigne(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Accessoire>
+     */
+    public function getAccessoires(): Collection
+    {
+        return $this->accessoires;
+    }
+
+    public function addAccessoire(Accessoire $accessoire): static
+    {
+        if (!$this->accessoires->contains($accessoire)) {
+            $this->accessoires->add($accessoire);
+            $accessoire->addListeAlloue($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAccessoire(Accessoire $accessoire): static
+    {
+        if ($this->accessoires->removeElement($accessoire)) {
+            $accessoire->removeListeAlloue($this);
         }
 
         return $this;

@@ -38,7 +38,7 @@ class OrdinateurCrudController extends AbstractCrudController
             ->setPageTitle(Crud::PAGE_EDIT, 'Modifier l\'ordinateur')
             ->setEntityLabelInSingular('Ordinateur')
             ->setEntityLabelInPlural('Ordinateurs')
-            ->setSearchFields(['modele', 'categorie', 'sousCategorie'])
+            ->setSearchFields(['modele', 'categorie', 'sousCategorie', 'processeur'])
             ->setDefaultSort(['createdAt' => 'DESC']);
     }
 
@@ -54,32 +54,23 @@ class OrdinateurCrudController extends AbstractCrudController
         return [
 
             FormField::addPanel('Données Générales')->setIcon('fa fa-box'),
-            ChoiceField::new('categorie', 'Categorie')
-                ->autocomplete()
-                ->setChoices(
-                    [
-                        'PC' => 'PC',
-                        'Serveur' => 'Serveur',
-                    ]
-                )
-                ->setColumns(6)
-                ->setHelp('Exemple : PC ou Serveur'),
-            ChoiceField::new('sousCategorie', 'Sous-catégorie')
-                ->autocomplete()
-                ->setChoices(
-                    [
-                        'Fixe' => 'Fixe',
-                        'Portable' => 'Portable',
-                    ]
-                )
-                ->setColumns(6)
+            AssociationField::new('types', 'Catégorie')
+                ->setColumns(4)
+                ->setHelp('Exemple : Pc ou serveur Rack'),
+            AssociationField::new('sousCatPoste', 'Sous-catégorie')
+                ->setColumns(4)
                 ->setHelp('Exemple : Fixe ou Portable')
+                ->hideOnIndex(),
+            AssociationField::new('taillePouce', 'Taille en pouces')
+                ->setColumns(4)
+                ->setHelp('Exemple : 15 pouces')
                 ->hideOnIndex(),
             TextField::new('nom', 'Nom')
                 ->setHelp('Nom de l\'ordinateur'),
-            MoneyField::new('prix', 'Prix')->setCurrency('EUR'),
+            MoneyField::new('prix', 'Prix')->setCurrency('EUR')->hideOnIndex(),
             DateField::new('createdAt', 'Date d\'ajout')->hideOnForm()->hideOnIndex(),
-            DateField::new('buyAt', 'Date d\'achat'),
+            DateField::new('buyAt', 'Date d\'achat')->hideOnIndex(),
+
 
             FormField::addPanel('Détails Ordinateur')->setIcon('fa fa-desktop'),
             TextField::new('modele', 'Modele')
@@ -88,7 +79,8 @@ class OrdinateurCrudController extends AbstractCrudController
                 ->hideOnIndex(),
             TextField::new('identifiant', 'Numéro de série')
                 ->setHelp('Identifiant unique de l\'ordinateur')
-                ->setColumns(6),
+                ->setColumns(6)
+                ->hideOnIndex(),
             SlugField::new('slug', 'Identifiant')
                 ->setTargetFieldName('identifiant')
                 ->setHelp('Identifiant unique de l\'ordinateur')
@@ -96,15 +88,12 @@ class OrdinateurCrudController extends AbstractCrudController
                 ->setColumns(6),
             TextField::new('processeur', 'Processeur')
                 ->setHelp('Exemple : Intel Core i7-10700K')
-                ->setColumns(6)
-                ->hideOnIndex(),
-            TextField::new('os', 'Système d\'exploitation')
-                ->setHelp('Exemple : Windows 10 Pro')
+                ->setColumns(6),
+            AssociationField::new('systemeExploitation', 'Système d\'exploitation')
                 ->setColumns(6),
             NumberField::new('ram', 'RAM (en Go)')
                 ->setHelp('Exemple : 16')
-                ->setColumns(6)
-                ->hideOnIndex(),
+                ->setColumns(6),
             NumberField::new('stockage', 'Stockage (en Go)')
                 ->setHelp('Exemple : 512')
                 ->setColumns(6),
@@ -114,7 +103,7 @@ class OrdinateurCrudController extends AbstractCrudController
                 ->hideOnIndex(),
 
             FormField::addPanel('Affectation')->setIcon('fa fa-user'),
-            BooleanField::new('isStock', 'En stock'),
+            BooleanField::new('isStock', 'En stock')->hideOnIndex(),
             AssociationField::new('localisation', 'Bureau')
                 ->setCssClass('enStock')
                 ->setFormTypeOption('disabled', false)
@@ -123,8 +112,7 @@ class OrdinateurCrudController extends AbstractCrudController
             AssociationField::new('utilisateur', 'Utilisateur')
                 ->setCssClass('enStock')
                 ->setFormTypeOption('disabled', false)
-                ->setHelp('Utilisateur à qui le matériel est affecté')
-                ->hideOnIndex(),
+                ->setHelp('Utilisateur à qui le matériel est affecté'),
 
         ];
     }

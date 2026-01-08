@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\Ecran;
+use App\Entity\Accessoire;
 use App\Entity\Ordinateur;
 use App\Entity\Petitmateriel;
 use Doctrine\ORM\Mapping as ORM;
@@ -16,6 +17,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
     "ecran" => Ecran::class,
     "ordinateur" => Ordinateur::class,
     "petit_materiel" => Petitmateriel::class,
+    "accessoire" => Accessoire::class
     // tu pourras rajouter d'autres types ici
 ])]
 

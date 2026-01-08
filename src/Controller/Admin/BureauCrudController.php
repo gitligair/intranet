@@ -19,13 +19,29 @@ class BureauCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
+
+
         return [
             IdField::new('id')->onlyOnIndex(),
             TextField::new('nom', 'Nom du bureau'),
-            AssociationField::new('occupant', 'Occupant')
+
+            // affichage sur index
+            AssociationField::new('occupant', 'Occupants')
+                ->onlyOnIndex()
+                ->formatValue(function ($value, $bureau) {
+                    $users = $bureau->getOccupant(); // Collection<User>
+                    if ($users->isEmpty()) return '';
+
+                    return implode('<br/>', $users->map(fn($u) => (string) $u)->toArray());
+                }),
+
+            // champ relation pour les formulaires
+            AssociationField::new('occupant', 'Occupants')
+                ->onlyOnForms()
                 ->setFormTypeOption('by_reference', false)
                 ->setFormTypeOption('multiple', true)
-                ->setHelp('Utilisateur à qui le matériel est affecté'),
+                ->setHelp('Utilisateurs affectés à ce bureau'),
+
             TextEditorField::new('description'),
         ];
     }

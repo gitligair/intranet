@@ -132,6 +132,6 @@ class TypeMateriel
 
     public function __toString(): string
     {
-        return strtoupper($this->nom);
+        return $this->nom;
     }
 }

@@ -172,38 +172,7 @@
 				{% set dayKey = day|date('Y-m-d') %}
 
 				<div class="timeline-cell" data-date="{{ dayKey }}" data-user="{{ user.id }}">
-
-
-					{% for t in taches %}
-						{% if user in t.assignerA and t.dateExecution|date('Y-m-d') == dayKey %}
-
-							{% set startMin = t.heureDebut|date('H') * 60 + t.heureDebut|date('i') %}
-							{% set endMin = t.heureFin|date('H') * 60 + t.heureFin|date('i') %}
-							{% set duration = endMin - startMin %}
-
-							{% set percentLeft = (startMin / 1440) * 100 %}
-							{% set percentWidth = (duration / 1440) * 100 %}
-
-							<div class="task-block-h" style="left: {{ percentLeft }}%; width: {{ percentWidth }}%; background: {{ poleColors[t.pole.id] }};" data-id="{{ t.id }}" data-createdby="{{ t.createdBy.id }}" data-titre="{{ t.titre }}" data-description="{{ t.description|e }}" data-pole="{{ t.pole.nom }}" data-debut="{{ t.heureDebut|date('H:i') }}" data-fin="{{ t.heureFin|date('H:i') }}" data-deadline="{{ t.deadline ? t.deadline|date('Y-m-d') : '' }}" data-importance="{{ t.importance }}" data-users="{{ t.assignerA|map(a => a.id)|join(',') }}" data-usersnames="{{ t.assignerA|map(a => a.prenom ~ ' ' ~ a.nom)|join(',') }}">
-
-
-								{{ t.titre }}
-
-								{% if t.createdBy.id == app.user.id %}
-
-
-									<!-- Ces boutons doivent exister dans la page -->
-									<button class="edit-task-btn d-none" data-id="{{ t.id }}" data-dateexecution="{{ t.dateExecution|date('Y-m-d') }}" data-titre="{{ t.titre }}" data-description="{{ t.description|e }}" data-importance="{{ t.importance }}" data-deadline="{{ t.deadline ? t.deadline|date('Y-m-d') : '' }}" data-pole="{{ t.pole.id }}" data-assignera="{{ t.assignerA|map(a => a.id)|join(',') }}" data-heuredebut="{{ t.heureDebut|date('H:i') }}" data-heurefin="{{ t.heureFin|date('H:i') }}"></button>
-
-
-									<button class="delete-task-btn d-none" data-id="{{ t.id }}"></button>
-								{% endif %}
-							</div>
-
-
-						{% endif %}
-					{% endfor %}
-
+					{% include 'admin/_partials/_task_block.html.twig' with { taches:taches } %}
 				</div>
 			{% endfor %}
 		{% endfor %}

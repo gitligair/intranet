@@ -14,12 +14,6 @@ class Ordinateur extends Materiel
     #[ORM\Column(length: 255)]
     private ?string $modele = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $categorie = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $sousCategorie = null;
-
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $processeur = null;
 
@@ -42,6 +36,18 @@ class Ordinateur extends Materiel
     #[Gedmo\Slug(fields: ['identifiant'])]
     private ?string $slug = null;
 
+    #[ORM\ManyToOne(inversedBy: 'ordinateurs')]
+    private ?TaillePouce $taillePouce = null;
+
+    #[ORM\ManyToOne(inversedBy: 'ordinateurs')]
+    private ?Categorie $types = null;
+
+    #[ORM\ManyToOne(inversedBy: 'ordinateurs')]
+    private ?SousCategorie $sousCatPoste = null;
+
+    #[ORM\ManyToOne(inversedBy: 'ordinateurs')]
+    private ?Os $systemeExploitation = null;
+
 
     public function getModele(): ?string
     {
@@ -55,29 +61,6 @@ class Ordinateur extends Materiel
         return $this;
     }
 
-    public function getCategorie(): ?string
-    {
-        return $this->categorie;
-    }
-
-    public function setCategorie(string $categorie): static
-    {
-        $this->categorie = $categorie;
-
-        return $this;
-    }
-
-    public function getSousCategorie(): ?string
-    {
-        return $this->sousCategorie;
-    }
-
-    public function setSousCategorie(string $sousCategorie): static
-    {
-        $this->sousCategorie = $sousCategorie;
-
-        return $this;
-    }
 
     public function getProcesseur(): ?string
     {
@@ -165,5 +148,53 @@ class Ordinateur extends Materiel
     public function __toString(): string
     {
         return $this->getType()->getNom() . ' - ' . $this->getModele() . ' ' . $this->getIdentifiant();
+    }
+
+    public function getTaillePouce(): ?TaillePouce
+    {
+        return $this->taillePouce;
+    }
+
+    public function setTaillePouce(?TaillePouce $taillePouce): static
+    {
+        $this->taillePouce = $taillePouce;
+
+        return $this;
+    }
+
+    public function getTypes(): ?Categorie
+    {
+        return $this->types;
+    }
+
+    public function setTypes(?Categorie $types): static
+    {
+        $this->types = $types;
+
+        return $this;
+    }
+
+    public function getSousCatPoste(): ?SousCategorie
+    {
+        return $this->sousCatPoste;
+    }
+
+    public function setSousCatPoste(?SousCategorie $sousCatPoste): static
+    {
+        $this->sousCatPoste = $sousCatPoste;
+
+        return $this;
+    }
+
+    public function getSystemeExploitation(): ?Os
+    {
+        return $this->systemeExploitation;
+    }
+
+    public function setSystemeExploitation(?Os $systemeExploitation): static
+    {
+        $this->systemeExploitation = $systemeExploitation;
+
+        return $this;
     }
 }

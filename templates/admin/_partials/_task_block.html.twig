@@ -1,0 +1,57 @@
+<div class="timeline-track">
+	{% for t in taches %}
+		{% if user in t.assignerA and t.dateExecution|date('Y-m-d') == dayKey %}
+
+			{# Fenêtre de travail #}
+			{% set DAY_START = 8 * 60 %}
+			{# 480 #}
+			{% set DAY_END   = 18 * 60 %}
+			{# 1080 #}
+			{% set DAY_SPAN  = DAY_END - DAY_START %}
+			{# 600 #}
+
+			{# Minutes absolues depuis 00:00 #}
+			{% set startAbs = t.heureDebut|date('H') * 60 + t.heureDebut|date('i') %}
+			{% set endAbs   = t.heureFin ? (t.heureFin|date('H') * 60 + t.heureFin|date('i')) : startAbs %}
+
+			{# Ordonner début/fin #}
+			{% set sRaw = min(startAbs, endAbs) %}
+			{% set eRaw = max(startAbs, endAbs) %}
+
+			{# Clamp dans 8h–18h #}
+			{% set s = max(DAY_START, min(sRaw, DAY_END)) %}
+			{% set e = max(DAY_START, min(eRaw, DAY_END)) %}
+
+			{# Minutes relatives à 8h #}
+			{% set relStart = s - DAY_START %}
+			{% set relEnd   = e - DAY_START %}
+			{% set minutesWidth = relEnd - relStart %}
+			{% set minutesWidth = minutesWidth < 5 ? 5 : minutesWidth %}
+			{# largeur mini de 5 min pour visibilité #}
+
+			{# Pourcentages sur 600 min #}
+			{% set percentLeft  = (relStart / DAY_SPAN) * 100 %}
+			{% set percentWidth = (minutesWidth / DAY_SPAN) * 100 %}
+
+			{# Arrondis sûrs (évite les virgules locales) #}
+			{% set percentLeft  = percentLeft|number_format(4, '.', '') %}
+			{% set percentWidth = percentWidth|number_format(4, '.', '') %}
+
+
+				<div class="task-block-h" style="left: {{ percentLeft }}%; width: {{ percentWidth }}%; background: {{ poleColors[t.pole.id] }};" data-id="{{ t.id }}" data-createdby="{{ t.createdBy.id }}" data-titre="{{ t.titre }}" data-description="{{ t.description|e }}" data-pole="{{ t.pole.nom }}" data-debut="{{ t.heureDebut|date('H:i') }}" data-fin="{{ t.heureFin|date('H:i') }}" data-deadline="{{ t.deadline ? t.deadline|date('Y-m-d') : '' }}" data-importance="{{ t.importance }}" data-users="{{ t.assignerA|map(a => a.id)|join(',') }}" data-usersnames="{{ t.assignerA|map(a => a.prenom ~ ' ' ~ a.nom)|join(',') }}"> {{ t.titre }}
+
+				{% if t.createdBy.id == app.user.id %}
+
+
+					<!-- Ces boutons doivent exister dans la page -->
+					<button class="edit-task-btn d-none" data-id="{{ t.id }}" data-dateexecution="{{ t.dateExecution|date('Y-m-d') }}" data-titre="{{ t.titre }}" data-description="{{ t.description|e }}" data-importance="{{ t.importance }}" data-deadline="{{ t.deadline ? t.deadline|date('Y-m-d') : '' }}" data-pole="{{ t.pole.id }}" data-assignera="{{ t.assignerA|map(a => a.id)|join(',') }}" data-heuredebut="{{ t.heureDebut|date('H:i') }}" data-heurefin="{{ t.heureFin|date('H:i') }}"></button>
+
+
+					<button class="delete-task-btn d-none" data-id="{{ t.id }}"></button>
+				{% endif %}
+			</div>
+
+
+		{% endif %}
+	{% endfor %}
+</div>

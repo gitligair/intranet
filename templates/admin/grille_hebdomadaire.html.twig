@@ -49,7 +49,20 @@
 			}
 
 			/* === BARRES DE TÂCHES === */
-
+			.timeline-cell {
+				position: relative;
+				padding: 0;
+			} /* pas de padding ici */
+			.timeline-track {
+				position: relative;
+				width: 100%;
+				height: 100%;
+			}
+			.task-block-h {
+				position: absolute;
+				top: 2px;
+				bottom: 2px;
+			}
 			.task-block-h {
 				position: absolute;
 				top: 15px;
@@ -187,39 +200,8 @@
 					{% for d in 0..4 %}
 						{% set day = startOfWeek|date_modify('+' ~ d ~ ' days') %}
 						{% set dayKey = day|date('Y-m-d') %}
-
 						<div class="timeline-cell" data-date="{{ dayKey }}" data-user="{{ user.id }}">
-
-
-							{% for t in taches %}
-								{% if user in t.assignerA and t.dateExecution|date('Y-m-d') == dayKey %}
-
-									{% set startMin = t.heureDebut|date('H') * 60 + t.heureDebut|date('i') %}
-									{% set endMin = t.heureFin|date('H') * 60 + t.heureFin|date('i') %}
-									{% set duration = endMin - startMin %}
-
-									{% set percentLeft = (startMin / 1440) * 100 %}
-									{% set percentWidth = (duration / 1440) * 100 %}
-
-									<div class="task-block-h" style="left: {{ percentLeft }}%; width: {{ percentWidth }}%; background: {{ poleColors[t.pole.id] }};" data-id="{{ t.id }}" data-createdby="{{ t.createdBy.id }}" data-titre="{{ t.titre }}" data-description="{{ t.description|e }}" data-pole="{{ t.pole.nom }}" data-debut="{{ t.heureDebut|date('H:i') }}" data-fin="{{ t.heureFin|date('H:i') }}" data-deadline="{{ t.deadline ? t.deadline|date('Y-m-d') : '' }}" data-importance="{{ t.importance }}" data-users="{{ t.assignerA|map(a => a.id)|join(',') }}" data-usersnames="{{ t.assignerA|map(a => a.prenom ~ ' ' ~ a.nom)|join(',') }}">
-
-
-										{{ t.titre }}
-
-										{% if t.createdBy.id == app.user.id %}
-
-
-											<!-- Ces boutons doivent exister dans la page -->
-											<button class="edit-task-btn d-none" data-id="{{ t.id }}" data-dateexecution="{{ t.dateExecution|date('Y-m-d') }}" data-titre="{{ t.titre }}" data-description="{{ t.description|e }}" data-importance="{{ t.importance }}" data-deadline="{{ t.deadline ? t.deadline|date('Y-m-d') : '' }}" data-pole="{{ t.pole.id }}" data-assignera="{{ t.assignerA|map(a => a.id)|join(',') }}" data-heuredebut="{{ t.heureDebut|date('H:i') }}" data-heurefin="{{ t.heureFin|date('H:i') }}"></button>
-
-
-											<button class="delete-task-btn d-none" data-id="{{ t.id }}"></button>
-										{% endif %}
-									</div>
-
-
-								{% endif %}
-							{% endfor %}
+							{% include 'admin/_partials/_task_block.html.twig' with { taches:taches } %}
 
 						</div>
 					{% endfor %}
@@ -243,6 +225,11 @@
 						<p id="viewDescription" class="text-muted"></p>
 
 						<div class="row mt-3">
+							<div class="col-md-12 my-2">
+								<div class="small text-muted">Date de la tâche :
+									<span id="modalTaskDateInfo">—</span>
+								</div>
+							</div>
 							<div class="col-md-6">
 								<div class="p-3 rounded bg-light">
 									<strong>⏱ Horaire</strong><br>
@@ -289,8 +276,28 @@
 		<!-- 🔔 Zone d'affichage des messages -->
 		<div id="alert-container" class="my-2"></div>
 
+		<script>
+			window.PLANNING_CFG = {
+CURRENT_USER_ID: {{ app.user.id }},
+routes: {
+partial: "{{ path('admin_planning_partial') }}",
+usersByPole: "{{ path('admin_planning_users_by_pole') }}",
+checkDispo: "{{ path('admin_planning_check_dispo') }}",
+save: "{{ path('admin_planning_save') }}",
+updateTmpl: "{{ path('admin_planning_update', {'id': 'REPLACE'}) }}", // garde 'REPLACE'
+deleteTmpl: "{{ path('admin_planning_delete', {'id': 'REPLACE'}) }}", // garde 'REPLACE'
+timelineWeek: "{{ path('admin_planning_timeline_week') }}"
+},
+poleColors: {{ poleColors|json_encode|raw }},
+// optionnel si tu utilises un token
+csrfToken: "{{ csrf_token('planning') }}"
+};
+		</script>
+
+		<script src="{{ asset('js/planning/planning.js') }}" defer></script>
+
 		{# SCRIPT JS #}
-		{% include "admin/js/planning_js.html.twig" %}
+
 	</div>
 
 {% endblock %}

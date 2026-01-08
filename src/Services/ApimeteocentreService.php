@@ -43,11 +43,16 @@ class ApimeteocentreService
     // Fonction qui retourne les information d'une station donnée
     public function getStations(): array
     {
-        // Prends n'importe laquelle des clés (chaque station a ses propres clés)
-        $station = $this->stations['cnrs']; // Par exemple ici
+        $station = $this->stations['cnrs']; // choix station propriétaire
 
         $timestamp = time();
-        $signature = hash_hmac('sha256', 'eeiuns90ahloj5mc1sijf68yvt5khlte' . $timestamp, 'xyn8eziatyqo8rl7gwblpbdgqnv0ly3h');
+
+        // signature correcte
+        $base = $station['apiSecret'] .
+            'api-key' . $station['apiKey'] .
+            't' . $timestamp;
+
+        $signature = hash('sha256', $base);
 
         $url = 'https://api.weatherlink.com/v2/stations';
 
@@ -64,23 +69,25 @@ class ApimeteocentreService
 
 
 
+
     // Méthode pour obtenir les données d'une station spécifique
 
-    public function getStationData(string $stationName): array
+    public function getStationData(string $stationKey, string $stationId): array
     {
-        if (!isset($this->stations[$stationName])) {
-            throw new \InvalidArgumentException("Station inconnue: $stationName");
+        if (!isset($this->stations[$stationKey])) {
+            throw new \InvalidArgumentException("Station inconnue: $stationKey");
         }
 
-        $station = $this->stations[$stationName];
-
-        // Génère le timestamp actuel
+        $station = $this->stations[$stationKey];
         $timestamp = time();
 
-        // Génère la signature HMAC SHA-256
-        $signature = hash_hmac('sha256', $station['apiKey'] . $timestamp, $station['apiSecret']);
+        $base = $station['apiSecret'] .
+            'api-key' . $station['apiKey'] .
+            't' . $timestamp;
 
-        $url = 'https://api.weatherlink.com/v2/current/' . $stationName;
+        $signature = hash('sha256', $base);
+
+        $url = 'https://api.weatherlink.com/v2/current/' . $stationId;
 
         $response = $this->httpClient->request('GET', $url, [
             'query' => [
@@ -90,6 +97,6 @@ class ApimeteocentreService
             ],
         ]);
 
-        return $response->toArray(); // Retourne le JSON sous forme de tableau PHP
+        return $response->toArray();
     }
 }

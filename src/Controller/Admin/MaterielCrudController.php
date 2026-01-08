@@ -46,7 +46,7 @@ class MaterielCrudController extends AbstractCrudController
             ->setPageTitle(Crud::PAGE_DETAIL, fn(Materiel $materiel) => (string) $materiel)
             ->setEntityLabelInPlural('Matériels')
             ->setEntityLabelInSingular('Matériel')
-            ->setSearchFields(['type', 'nom', 'utilisateur.nom', 'utilisateur.prenom'])
+            ->setSearchFields(['nom', 'utilisateur.nom', 'utilisateur.prenom'])
             ->setDefaultSort(['buyAt' => 'DESC']);
     }
 
@@ -92,6 +92,13 @@ class MaterielCrudController extends AbstractCrudController
         } elseif ($materiel->getType()->getId() === 3) {
             $url = $this->adminUrlGenerator
                 ->setController(PetitmaterielCrudController::class)
+                ->setAction(Crud::PAGE_DETAIL)
+                ->setEntityId($materiel->getId())
+                ->generateUrl();
+            return new RedirectResponse($url);
+        } elseif ($materiel->getType()->getId() === 4) {
+            $url = $this->adminUrlGenerator
+                ->setController(AccessoireCrudController::class)
                 ->setAction(Crud::PAGE_DETAIL)
                 ->setEntityId($materiel->getId())
                 ->generateUrl();

@@ -125,28 +125,6 @@ class UserCrudController extends AbstractCrudController
         parent::persistEntity($entityManager, $entityInstance);
     }
 
-    // public function updatetEntity(EntityManagerInterface $entityManager, $entityInstance): void
-    // {
-    //     if (!$entityInstance instanceof User) {
-    //         return;
-    //     }
-
-    //     // Récupérer le mot de passe du formulaire (qui n'est pas stocké en base)
-    //     $confirmPassword = $this->getContext()->getRequest()->get('User')['password_'];
-
-
-
-
-    //     if ($entityInstance->getPassword() !== $confirmPassword) {
-    //         throw new \RuntimeException('Les mots de passe ne correspondent pas.');
-    //     }
-    //     if ($entityInstance->getPassword()) {
-    //         $hashedPassword = $this->passwordHasher->hashPassword($entityInstance, $entityInstance->getPassword());
-    //         $entityInstance->setPassword($hashedPassword);
-    //     }
-
-    //     parent::updateEntity($entityManager, $entityInstance);
-    // }
 
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {

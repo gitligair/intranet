@@ -28,7 +28,8 @@ class PetitmaterielCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setPageTitle(Crud::PAGE_INDEX, 'Petit Matériel');
+            ->setEntityLabelInSingular('Petit matériel')
+            ->setEntityLabelInPlural('Petits matériels (stations d\'accueils ...)');
     }
 
 

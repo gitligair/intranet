@@ -20,10 +20,10 @@ final class ServicesController extends AbstractController
 
     #Retourne sous forme de json les données d'une station donnée
     #[Route('/donnees/{station}', name: 'donnees_station')]
-    public function station(ApimeteocentreService $client, string $station): JsonResponse
+    public function station(ApimeteocentreService $client, string $stationKey, string $stationId): JsonResponse
     {
         try {
-            $data = $client->getStationData($station);
+            $data = $client->getStationData($stationKey, $stationId);
             return $this->json($data);
         } catch (\Throwable $e) {
             return $this->json(['error' => $e->getMessage()], 500);

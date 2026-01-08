@@ -1,72 +1,73 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Donnée Meteo centre{% endblock %}
+{% block title %}Donnée Meteo centre
+{% endblock %}
 {% block stylesheets %}
-{{ parent() }}
-<style>
-    .section {
+	{{ parent() }}
+	<style>
+		.section {
 
-        height: 100vh;
-    }
-</style>
+			height: 100vh;
+		}
+	</style>
 {% endblock %}
 {% block body %}
-<style>
-    .hover-card {
-        background-color: #ffffff;
-        transition: all 0.3s ease;
-    }
+	<style>
+		.hover-card {
+			background-color: #ffffff;
+			transition: all 0.3s ease;
+		}
 
-    .hover-card:hover {
-        background-color: #a5cff8;
-        transform: translateY(-5px);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-    }
-</style>
-<div class="container py-5 my-5">
-    <h2 class="titre_section">stations </h2>
-    <p class="text-light">Acces aux données par station de meteo centre</p>
-
-
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
-
-        <!-- Bloc 1 -->
-        <div class="col">
-            <a href="{{path('donnees_station',{'station':" Orléans - CNRS - Meteo-Centre.fr"})}}"
-                class="text-decoration-none text-dark">
-                <div
-                    class="d-flex flex-column align-items-center text-center p-4 border rounded-3 shadow-sm hover-card h-100">
-                    <i class="bi bi-pc fs-1 text-secondary mb-3"></i>
-                    <h5 class="mb-1">Station Bazoches</h5>
-                    <p class="text-muted small mb-0">Acces aux données de la station Bazoches</p>
-                </div>
-            </a>
-        </div>
-        <!-- Bloc 2 -->
-        <div class="col">
-            <a href="#link2" class="text-decoration-none text-dark">
-                <div
-                    class="d-flex flex-column align-items-center text-center p-4 border rounded-3 shadow-sm hover-card h-100">
-                    <i class="bi bi-pc-display fs-1 text-warning mb-3"></i>
-                    <h5 class="mb-1">Station CNRS</h5>
-                    <p class="text-muted small mb-0">Gérez vos informations personnelles et préférences.</p>
-                </div>
-            </a>
-        </div>
-        <!-- Bloc 3 -->
-        <div class="col">
-            <a href="#link2" class="text-decoration-none text-dark">
-                <div
-                    class="d-flex flex-column align-items-center text-center p-4 border rounded-3 shadow-sm hover-card h-100">
-                    <i class="bi bi-pc-display-horizontal fs-1 text-info mb-3"></i>
-                    <h5 class="mb-1">Station Droué</h5>
-                    <p class="text-muted small mb-0">Gérez vos informations personnelles et préférences.</p>
-                </div>
-            </a>
-        </div>
+		.hover-card:hover {
+			background-color: #a5cff8;
+			transform: translateY(-5px);
+			box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+		}
+	</style>
+	<div class="container py-5 my-5">
+		<h2 class="titre_section">stations
+		</h2>
+		<p class="text-light">Acces aux données par station de meteo centre</p>
 
 
-        {% endblock %}
-        {% block javascripts %}
-        {{ parent() }}
-        {% endblock %}
+		<div
+			class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+
+			<!-- Bloc 1 -->
+			<div class="col">
+				<a href="#link1" class="text-decoration-none text-dark">
+					<div class="d-flex flex-column align-items-center text-center p-4 border rounded-3 shadow-sm hover-card h-100">
+						<i class="bi bi-pc fs-1 text-secondary mb-3"></i>
+						<h5 class="mb-1">Station Bazoches</h5>
+						<p class="text-muted small mb-0">Acces aux données de la station Bazoches</p>
+					</div>
+				</a>
+			</div>
+			<!-- Bloc 2 -->
+			<div class="col">
+				<a href="{{path('donnees_station',{'station':" Orléans - CNRS - Meteo-Centre.fr"})}}" class="text-decoration-none text-dark">
+
+					<div class="d-flex flex-column align-items-center text-center p-4 border rounded-3 shadow-sm hover-card h-100">
+						<i class="bi bi-pc-display fs-1 text-warning mb-3"></i>
+						<h5 class="mb-1">Station CNRS</h5>
+						<p class="text-muted small mb-0">Acces aux données de la station CNRS</p>
+
+					</div>
+				</a>
+			</div>
+			<!-- Bloc 3 -->
+			<div class="col">
+				<a href="#link2" class="text-decoration-none text-dark">
+					<div class="d-flex flex-column align-items-center text-center p-4 border rounded-3 shadow-sm hover-card h-100">
+						<i class="bi bi-pc-display-horizontal fs-1 text-info mb-3"></i>
+						<h5 class="mb-1">Station Droué</h5>
+						<p class="text-muted small mb-0">Acces aux données de la station Droué</p>
+					</div>
+				</a>
+			</div>
+
+
+		{% endblock %}
+		{% block javascripts %}
+			{{ parent() }}
+		{% endblock %}
