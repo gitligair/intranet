@@ -121,7 +121,7 @@ class MaterielCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->onlyOnIndex(),
-            TextField::new('type', 'Type de matériel')
+            AssociationField::new('type', 'Type de matériel')
                 ->hideOnForm(),
             TextField::new('nom', 'Nom')
                 ->hideOnForm(),

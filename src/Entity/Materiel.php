@@ -6,6 +6,7 @@ use App\Entity\Ecran;
 use App\Entity\Accessoire;
 use App\Entity\Ordinateur;
 use App\Entity\Petitmateriel;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\MaterielRepository;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -54,7 +55,8 @@ abstract class Materiel
     #[ORM\Column]
     private ?bool $isStock = null;
 
-    #[ORM\Column(nullable: true)]
+
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $buyAt = null;
 
     #[ORM\Column(nullable: true)]
