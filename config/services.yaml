@@ -4,31 +4,40 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+  locale: "fr"
+  scripts_directory: "%kernel.project_dir%/public/uploads/scripts"
 
 services:
-    # default configuration for services in *this* file
-    _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
-    App\:
-        resource: '../src/'
-        exclude:
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
-            - '../src/Kernel.php'
+  # makes classes in src/ available to be used as services
+  # this creates a service per class whose id is the fully-qualified class name
+  App\:
+    resource: "../src/"
+    exclude:
+      - "../src/DependencyInjection/"
+      - "../src/Entity/"
+      - "../src/Kernel.php"
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
-    App\Services\ApimeteocentreService:
-        arguments:
-            $apiKey_cnrs: '%env(WEATHERLINK_API_KEY_CNRS)%'
-            $apiSecret_cnrs: '%env(WEATHERLINK_API_SECRET_CNRS)%'
+  # add more service definitions when explicit configuration is needed
+  # please note that last definitions always *replace* previous ones
+  App\Services\ApimeteocentreService:
+    arguments:
+      $apiKey_cnrs: "%env(WEATHERLINK_API_KEY_CNRS)%"
+      $apiSecret_cnrs: "%env(WEATHERLINK_API_SECRET_CNRS)%"
 
-            $apiKey_droue: '%env(WEATHERLINK_API_KEY_DROUE)%'
-            $apiSecret_droue: '%env(WEATHERLINK_API_SECRET_DROUE)%'
+      $apiKey_droue: "%env(WEATHERLINK_API_KEY_DROUE)%"
+      $apiSecret_droue: "%env(WEATHERLINK_API_SECRET_DROUE)%"
 
-            $apiKey_bazoches: '%env(WEATHERLINK_API_KEY_BAZOCHES)%'
-            $apiSecret_bazoches: '%env(WEATHERLINK_API_SECRET_BAZOCHES)%'
+      $apiKey_bazoches: "%env(WEATHERLINK_API_KEY_BAZOCHES)%"
+      $apiSecret_bazoches: "%env(WEATHERLINK_API_SECRET_BAZOCHES)%"
+
+      $apiKey_ligair: "%env(LIGAIR_API_KEY)%"
+      $apiSecret_ligair: "%env(LIGAIR_API_SECRET)%"
+
+  App\Controller\Admin\BaseScriptCrudController:
+    arguments:
+      $scriptsDirectory: "%scripts_directory%"

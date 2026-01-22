@@ -25,4 +25,11 @@ return [
     '@hotwired/turbo' => [
         'version' => '7.3.0',
     ],
+    'highlight.js' => [
+        'version' => '11.11.1',
+    ],
+    'admin/highlight' => [
+        'path' => 'assets/admin/highlight.js',
+        'entrypoint' => true,
+    ],
 ];

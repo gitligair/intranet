@@ -12,6 +12,7 @@ use App\Entity\Services;
 use App\Entity\Categorie;
 use App\Entity\Processus;
 use App\Entity\Accessoire;
+use App\Entity\BaseScript;
 use App\Entity\Ordinateur;
 use App\Entity\TaillePouce;
 use App\Entity\CotechVacarm;
@@ -63,9 +64,10 @@ class AdministrationController extends AbstractDashboardController
         return [
             MenuItem::linkToDashboard('Tableau de bord', 'fa fa-home'),
             MenuItem::section('Organisation'),
-            MenuItem::linkToRoute('Planning hebdomadaire', 'fa fa-calendar-week', 'admin_planning'),
+            MenuItem::linkToRoute('Formulaire Agile', 'fa fa-user', 'forumlaire_agile'),
+            // MenuItem::linkToRoute('Planning hebdomadaire', 'fa fa-calendar-week', 'admin_planning'),
             MenuItem::linkToRoute('Planning par personne', 'fa fa-user', 'admin_planning_grille'),
-            MenuItem::linkToRoute('📊 Planning par pôle', 'fa fa-building', 'admin_planning_recap_poles'),
+            // MenuItem::linkToRoute('📊 Planning par pôle', 'fa fa-building', 'admin_planning_recap_poles'),
 
 
             MenuItem::section('Systeme qualité'),
@@ -81,6 +83,7 @@ class AdministrationController extends AbstractDashboardController
             MenuItem::subMenu('Configuration', 'fa-solid fa-tools')->setSubItems([
                 MenuItem::linkToCrud('Types de matériel', 'fa-solid fa-box', TypeMateriel::class),
             ]),
+            MenuItem::linkToCrud('Liste des scripts', 'fa-solid fa-house-laptop', BaseScript::class),
 
             MenuItem::section('Matériels informatiques'),
             MenuItem::subMenu('Désignations', 'fa-brands fa-typo3')->setSubItems([

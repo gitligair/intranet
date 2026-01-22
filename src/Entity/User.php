@@ -126,6 +126,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Accessoire::class, mappedBy: 'listeAlloues')]
     private Collection $accessoires;
 
+    /**
+     * @var Collection<int, BaseScript>
+     */
+    #[ORM\OneToMany(targetEntity: BaseScript::class, mappedBy: 'addedBy')]
+    private Collection $baseScripts;
+
 
     public function __construct()
     {
@@ -139,6 +145,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->tachesCrees = new ArrayCollection();
         $this->notifications = new ArrayCollection();
         $this->accessoires = new ArrayCollection();
+        $this->baseScripts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -580,6 +587,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->accessoires->removeElement($accessoire)) {
             $accessoire->removeListeAlloue($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BaseScript>
+     */
+    public function getBaseScripts(): Collection
+    {
+        return $this->baseScripts;
+    }
+
+    public function addBaseScript(BaseScript $baseScript): static
+    {
+        if (!$this->baseScripts->contains($baseScript)) {
+            $this->baseScripts->add($baseScript);
+            $baseScript->setAddedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBaseScript(BaseScript $baseScript): static
+    {
+        if ($this->baseScripts->removeElement($baseScript)) {
+            // set the owning side to null (unless already changed)
+            if ($baseScript->getAddedBy() === $this) {
+                $baseScript->setAddedBy(null);
+            }
         }
 
         return $this;

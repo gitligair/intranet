@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Services\WeatherLinkService;
 use App\Services\ApimeteocentreService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -32,8 +33,16 @@ final class ServicesController extends AbstractController
 
     // Retourne les details d'une station donnée
     #[Route('/station', name: 'weather_stations')]
-    public function stations(ApimeteocentreService $client): JsonResponse
+    public function stations(ApimeteocentreService $client, WeatherLinkService $weatherLinkService): JsonResponse
     {
+
+        $apiKey = $_ENV['LIGAIR_API_KEY'];
+        $apiSecret = $_ENV['LIGAIR_API_SECRET'];
+
+        $stations = $weatherLinkService->getStations($apiKey, $apiSecret);
+
+        dd($stations);
+
         try {
             $data = $client->getStations();
             return $this->json($data);

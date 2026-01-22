@@ -17,6 +17,8 @@ class ApimeteocentreService
         string $apiSecret_droue,
         string $apiKey_bazoches,
         string $apiSecret_bazoches,
+        string $apiKey_ligair,
+        string $apiSecret_ligair,
         HttpClientInterface $httpClient
     ) {
         $this->stations = [
@@ -35,6 +37,11 @@ class ApimeteocentreService
                 'apiSecret' => $apiSecret_bazoches,
 
             ],
+            'ligair' => [
+                'apiKey' => $apiKey_ligair,
+                'apiSecret' => $apiSecret_ligair,
+
+            ],
         ];
 
         $this->httpClient = $httpClient;
@@ -43,27 +50,28 @@ class ApimeteocentreService
     // Fonction qui retourne les information d'une station donnée
     public function getStations(): array
     {
-        $station = $this->stations['cnrs']; // choix station propriétaire
+        $station = $this->stations['ligair']; // choix station propriétaire
 
-        $timestamp = time();
+        $t = time();
 
-        // signature correcte
-        $base = $station['apiSecret'] .
-            'api-key' . $station['apiKey'] .
-            't' . $timestamp;
+        // CHAÎNE à signer exactement
+        $stringToSign = 'api-key=' . $station['apiKey'] . '&t=' . $t;
 
-        $signature = hash('sha256', $base);
+        // signature HMAC SHA256 avec le secret
+        $signature = hash_hmac('sha256', $stringToSign, $station['apiSecret']);
 
+        // URL complète
         $url = 'https://api.weatherlink.com/v2/stations';
 
         $response = $this->httpClient->request('GET', $url, [
             'query' => [
                 'api-key' => $station['apiKey'],
-                't' => $timestamp,
+                't' => $t,
                 'api-signature' => $signature,
             ],
         ]);
 
+        $data = $response->toArray();
         return $response->toArray();
     }
 

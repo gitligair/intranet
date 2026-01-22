@@ -1,0 +1,560 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block page_title %}Formulaire Agile
+{% endblock %}
+{% block content_title %}Formulaire Agile
+{% endblock %}
+
+
+{% block main %}
+
+	{% block page_actions %}
+		<a class="btn btn-info" href="{{ ea_url().setController('App\\\\Controller\\\\Admin\\\\FormulaireCrudController').setAction('index') }}">
+			Liste des formulaires créés
+		</a>
+	{% endblock %}
+	<style>
+		/* --- look épuré --- */
+		.word-card {
+			border: 1px solid #e7e7e7;
+			border-radius: 10px;
+			background: #fff;
+		}
+		.word-card-title {
+			padding: 10px 12px;
+			font-weight: 600;
+			background: #fafafa;
+			border-bottom: 1px solid #ececec;
+			border-top-left-radius: 10px;
+			border-top-right-radius: 10px;
+			font-size: 13px;
+			letter-spacing: 0.2px;
+			text-transform: uppercase;
+		}
+		.word-card-body {
+			padding: 12px;
+		}
+
+		.pole-card {
+			border: 1px solid #ededed;
+			border-radius: 12px;
+			background: #fff;
+			box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+		}
+		.pole-card-body {
+			padding: 12px;
+		}
+
+		.pole-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+			gap: 10px;
+			margin-bottom: 10px;
+		}
+		.pole-name {
+			font-weight: 600;
+			font-size: 13px;
+			line-height: 1.2;
+		}
+		.pole-meta {
+			font-size: 12px;
+			color: #6b7280;
+			margin-top: 3px;
+		}
+
+		.btn-word {
+			border: 1px solid #d7d7d7;
+			background: #fff;
+			padding: 6px 10px;
+			border-radius: 10px;
+			font-size: 13px;
+			font-weight: 700;
+		}
+		.btn-word:hover {
+			background: #f7f7f7;
+		}
+
+		.word-table {
+			width: 100%;
+			border-collapse: collapse;
+			table-layout: fixed;
+		}
+		.word-table th,
+		.word-table td {
+			border: 1px solid #ededed;
+			padding: 6px;
+			vertical-align: top;
+			font-size: 13px;
+		}
+		.word-table th {
+			background: #fbfbfb;
+			font-weight: 800;
+			color: #374151;
+		}
+
+		.word-input,
+		.word-select {
+			width: 100%;
+			border: 1px solid #e3e3e3;
+			border-radius: 8px;
+			padding: 6px 8px;
+			font-size: 13px;
+			background: #fff;
+		}
+		.word-input:focus,
+		.word-select:focus {
+			outline: none;
+			border-color: #c9c9c9;
+		}
+
+		.btn-icon {
+			border: 1px solid #f0caca;
+			background: #fff;
+			padding: 4px 8px;
+			border-radius: 10px;
+		}
+		.btn-icon:hover {
+			background: #fff5f5;
+		}
+		.tache-num {
+			font-weight: 800;
+			color: #374151;
+		}
+		.tache-card {
+			border: 1px solid #e5e7eb;
+			border-radius: 10px;
+			padding: 10px;
+			background: #fafafa;
+		}
+
+		.tache-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 8px;
+		}
+
+		.tache-title {
+			font-weight: 700;
+			font-size: 13px;
+			color: #374151;
+		}
+
+		.tache-num {
+			color: #111827;
+		}
+	</style>
+
+
+	<div class="w-100">
+		<form method="post" action="">
+			<input
+			type="hidden" name="_token" value="{{ csrf_token('formulaire_agile_create') }}">
+
+			{# 1) Infos réunion (table style Word) #}
+			<div class="word-card">
+				<div class="word-card-title">Formulaire réunion hebdomadaire d’équipe</div>
+				<div class="word-card-body">
+					<table
+						class="word-table">
+						{# Infos reunion #}
+						<tr>
+							<td style="width: 25%;">
+								<div class="word-label">Date</div>
+								<input class="word-input" type="date" name="dateReunion" required>
+							</td>
+							<td style="width: 25%;">
+								<div class="word-label">Heure</div>
+								<input class="word-input" type="time" name="heureReunion">
+							</td>
+							<td style="width: 25%;">
+								<div class="word-label">Animateur</div>
+								<select class="word-select" name="animateurId">
+									<option value="">-- Choisir --</option>
+									{% for u in users %}
+										<option value="{{ u.id }}">{{ u.nom }}
+											{{ u.prenom }}</option>
+									{% endfor %}
+								</select>
+							</td>
+							<td style="width: 25%;">
+								<div class="word-label">Réunion tenue ?</div>
+								<label class="word-checkbox">
+									<input type="checkbox" name="reunionTenue" value="1">
+									<span>Oui</span>
+								</label>
+							</td>
+						</tr>
+						{# Participants #}
+						<tr>
+							<td colspan="4">
+								<div class="word-label">Participants (initiales / noms)</div>
+								{% for u in users %}
+									{% set prenomInitiale = u.prenom|trim|slice(0,1)|upper %}
+									{% set nomInitiales = '' %}
+
+									{% for part in u.nom|trim|split(' ') %}
+
+										{% set nomInitiales = nomInitiales ~ part|slice(0,1)|upper %}
+									{% endfor %}
+
+									<div class="form-check form-check-inline">
+										<input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="{{u.id}}" name="participantsIds[]">
+										<label class="form-check-label" for="inlineCheckbox1">{{ prenomInitiale }}{{ nomInitiales }}</label>
+
+									</div>
+								{% endfor %}
+							</td>
+						</tr>
+						{# Objectifs #}
+						<tr>
+							<td colspan="4">
+								<div class="word-label">Objectifs</div>
+								<input class="word-input" type="text" name="objectifs" placeholder="Objectifs de la réunion">
+							</td>
+						</tr>
+						{# Points clés #}
+						<tr>
+							<td colspan="4">
+								<div class="word-label">Points clés (travaux urgents / importants, difficultés, décisions…)</div>
+								<textarea class="form-control " name="pointsCles"></textarea>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+
+			{# 2) Tâches prioritaires par pôle #}
+
+
+			<div class="word-card">
+				<div class="word-card-title">Tâches prioritaires par pôle</div>
+
+				<div class="word-card-body">
+					<div class="row g-3">
+						{% for pole in poles %}
+							<div class="col-md-6">
+								<div class="pole-card">
+									<div class="pole-card-body">
+
+										<div class="pole-header">
+											<div>
+												<div class="pole-name">{{ pole.nom }}</div>
+												<div class="pole-meta">
+													Responsable :
+													{{ pole.responsable ? pole.responsable.nom ~ ' ' ~ pole.responsable.prenom : '—' }}
+													· Personnel :
+													{{ pole.personnel|length }}
+												</div>
+											</div>
+
+											<button type="button" class="btn-word btnAddTachePole" data-pole-id="{{ pole.id }}">
+												+ Tâche
+											</button>
+										</div>
+
+										{# Tâches du pôle #}
+										<div class="tachesTbodyPole" data-pole-id="{{ pole.id }}">
+
+											<div class="tache-row" data-index="0" data-pole-id="{{ pole.id }}">
+
+												<div class="tache-card">
+
+													<div class="tache-header">
+														<span class="tache-title">
+															Tâche
+															<span class="tache-num">1</span>
+														</span>
+
+														<button type="button" class="btn-icon btnRemoveTachePole" title="Supprimer">
+															✕
+														</button>
+													</div>
+
+													<div
+														class="row g-2">
+
+														<!-- Description -->
+														<div class="col-12">
+															<label class="form-label small">Description</label>
+															<input class="word-input" type="text" name="tachesParPole[{{ pole.id }}][0][description]" placeholder="Décrire la tâche">
+														</div>
+
+														<!-- Pilote -->
+														<div class="col-md-4">
+															<label class="form-label small">Pilote</label>
+															<select class="word-select" name="tachesParPole[{{ pole.id }}][0][piloteId]">
+																<option value="">—</option>
+																{% if pole.responsable %}
+																	<option value="{{ pole.responsable.id }}">
+																		{{ pole.responsable.nom }}
+																		{{ pole.responsable.prenom }}
+																		(Resp.)
+																	</option>
+																{% endif %}
+																{% for u in pole.personnel %}
+																	{% set prenomInitiale = u.prenom|slice(0,1)|upper %}
+																	{% set nomInitiales = u.nom|split(' ')|map(p => p|slice(0,1)|upper)|join %}
+																	<option value="{{ u.id }}">{{ prenomInitiale }}{{ nomInitiales }}</option>
+																{% endfor %}
+															</select>
+														</div>
+
+														<!-- Doublon -->
+														<div class="col-md-4">
+															<label class="form-label small">Doublon</label>
+															<select class="word-select" name="tachesParPole[{{ pole.id }}][0][doublonId]">
+																<option value="">—</option>
+																{% if pole.responsable %}
+																	<option value="{{ pole.responsable.id }}">
+																		{{ pole.responsable.nom }}
+																		{{ pole.responsable.prenom }}
+																		(Resp.)
+																	</option>
+																{% endif %}
+																{% for u in pole.personnel %}
+																	{% set prenomInitiale = u.prenom|slice(0,1)|upper %}
+																	{% set nomInitiales = u.nom|split(' ')|map(p => p|slice(0,1)|upper)|join %}
+																	<option value="{{ u.id }}">{{ prenomInitiale }}{{ nomInitiales }}</option>
+																{% endfor %}
+															</select>
+														</div>
+
+														<!-- Délai -->
+														<div class="col-md-3">
+															<label class="form-label small">Délai</label>
+															<input class="word-input" type="datetime-local" name="tachesParPole[{{ pole.id }}][0][delai]">
+														</div>
+
+														<!-- Fait -->
+														<div class="col-md-1 text-center">
+															<label class="form-label small">Fait</label>
+															<input type="checkbox" name="tachesParPole[{{ pole.id }}][0][fait]" value="1">
+														</div>
+
+													</div>
+												</div>
+											</div>
+										</div>
+
+										{# Template for new tache row #}
+										<template id="tpl-row-pole-{{ pole.id }}">
+											<div class="tache-row" data-index="__i__" data-pole-id="{{ pole.id }}">
+
+												<div class="tache-card">
+
+													<div class="tache-header">
+														<span class="tache-title">
+															Tâche
+															<span class="tache-num">__n__</span>
+														</span>
+
+														<button type="button" class="btn-icon btnRemoveTachePole" title="Supprimer">
+															✕
+														</button>
+													</div>
+
+													<div class="row g-2">
+
+														<div class="col-12">
+															<label class="form-label small">Description</label>
+															<input class="word-input" type="text" name="tachesParPole[{{ pole.id }}][__i__][description]">
+														</div>
+
+														<div class="col-md-4">
+															<label class="form-label small">Pilote</label>
+															<select class="word-select" name="tachesParPole[{{ pole.id }}][__i__][piloteId]">
+																<option value="">—</option>
+																{% if pole.responsable %}
+																	<option value="{{ pole.responsable.id }}">
+																		{{ pole.responsable.nom }}
+																		{{ pole.responsable.prenom }}
+																		(Resp.)
+																	</option>
+																{% endif %}
+																{% for u in pole.personnel %}
+																	<option value="{{ u.id }}">{{ u.nom }}
+																		{{ u.prenom }}</option>
+																{% endfor %}
+															</select>
+														</div>
+
+														<div class="col-md-4">
+															<label class="form-label small">Doublon</label>
+															<select class="word-select" name="tachesParPole[{{ pole.id }}][__i__][doublonId]">
+																<option value="">—</option>
+																{% if pole.responsable %}
+																	<option value="{{ pole.responsable.id }}">
+																		{{ pole.responsable.nom }}
+																		{{ pole.responsable.prenom }}
+																		(Resp.)
+																	</option>
+																{% endif %}
+																{% for u in pole.personnel %}
+																	<option value="{{ u.id }}">{{ u.nom }}
+																		{{ u.prenom }}</option>
+																{% endfor %}
+															</select>
+														</div>
+
+														<div class="col-md-3">
+															<label class="form-label small">Délai</label>
+															<input class="word-input" type="datetime-local" name="tachesParPole[{{ pole.id }}][__i__][delai]">
+														</div>
+
+														<div class="col-md-1 text-center">
+															<label class="form-label small">Fait</label>
+															<input type="checkbox" name="tachesParPole[{{ pole.id }}][__i__][fait]" value="1">
+														</div>
+
+													</div>
+												</div>
+											</div>
+										</template>
+
+
+									</div>
+								</div>
+							</div>
+						{% endfor %}
+
+					</div>
+				</div>
+			</div>
+
+
+			{# 3) Partage & Suivi (style Word) #}
+			<div class="word-card">
+				<div class="word-card-title">Partage d’information & Suivi</div>
+				<div class="word-card-body">
+					<table class="word-table">
+						<tr>
+							<td colspan="2">
+								<div class="word-label">Partage d’information dans les équipes</div>
+								<textarea class="word-textarea" name="partageInformation"></textarea>
+							</td>
+						</tr>
+
+						<tr>
+							<td style="width: 50%;">
+								<div class="word-label">Prochaine réunion (date/heure)</div>
+								<input class="word-input" type="datetime-local" name="prochaineReunionAt">
+							</td>
+							<td style="width: 50%;">
+								<div class="word-label">Animateur prochaine réunion</div>
+								<select class="word-select" name="prochainAnimateurId">
+									<option value="">-- Choisir --</option>
+									{% for u in users %}
+										<option value="{{ u.id }}">{{ u.nom }}
+											{{ u.prenom }}</option>
+									{% endfor %}
+								</select>
+							</td>
+						</tr>
+
+						<tr>
+							<td colspan="2">
+								<div class="word-label">Suivi / commentaires (facultatif)</div>
+								<textarea class="word-textarea" name="suiviCommentaires"></textarea>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+
+			<div class="actions-bottom">
+				<button class="btn btn-primary my-2" type="submit">Créer</button>
+			</div>
+
+		</form>
+	</div>
+
+	<script>
+		(function () {
+
+function renumberPole(poleId) {
+const tbody = document.querySelector('.tachesTbodyPole[data-pole-id="' + poleId + '"]');
+if (! tbody) 
+return;
+
+
+
+const rows = tbody.querySelectorAll('tr.tache-row');
+rows.forEach((row, idx) => {
+row.dataset.index = String(idx);
+const num = row.querySelector('.tache-num');
+if (num) 
+num.textContent = String(idx + 1);
+
+
+
+row.querySelectorAll('[name]').forEach(el => {
+el.name = el.name.replace(new RegExp('tachesParPole\\[' + poleId + '\\]\\[\\d+\\]'), 'tachesParPole[' + poleId + '][' + idx + ']');
+});
+});
+}
+
+function addRowPole(poleId) {
+const tbody = document.querySelector('.tachesTbodyPole[data-pole-id="' + poleId + '"]');
+const tpl = document.getElementById('tpl-row-pole-' + poleId);
+if (! tbody || ! tpl) 
+return;
+
+
+
+const i = tbody.querySelectorAll('tr.tache-row').length;
+const html = tpl.innerHTML.replaceAll('__i__', String(i)).replaceAll('__n__', String(i + 1));
+
+const temp = document.createElement('div');
+
+
+temp.innerHTML = html.trim();
+tbody.appendChild(temp.firstElementChild);
+}
+
+document.addEventListener('click', function (e) {
+const btnAdd = e.target.closest('.btnAddTachePole');
+if (btnAdd) {
+addRowPole(btnAdd.getAttribute('data-pole-id'));
+return;
+}
+
+const btnRemove = e.target.closest('.btnRemoveTachePole');
+if (btnRemove) {
+const row = btnRemove.closest('.tache-row');
+if (! row) 
+return;
+
+
+
+const poleId = row.getAttribute('data-pole-id');
+const container = document.querySelector('.tachesTbodyPole[data-pole-id="' + poleId + '"]');
+
+if (! container) 
+return;
+
+
+
+const rows = container.querySelectorAll('.tache-row');
+
+// ⛔ Bloque la suppression s'il ne reste qu'une tâche
+if (rows.length <= 1) {
+// Option simple (silencieuse)
+// return;
+
+// Option UX (recommandée)
+alert('Au moins une tâche doit être présente pour ce pôle.');
+return;
+}
+
+row.remove();
+renumberPole(poleId);
+}
+
+});
+
+})();
+	</script>
+
+{% endblock %}

@@ -1,0 +1,7 @@
+{% if field.formattedValue %}
+	<pre style="max-height:900px;width:60%; overflow:auto; background:#0d1117; color:#c9d1d9; padding:15px; border-radius:6px; font-size:13px;">
+        <code class="hljs">{{ field.formattedValue|e('html') }}</code>
+    </pre>
+{% else %}
+	<em>Contenu inaccessible</em>
+{% endif %}

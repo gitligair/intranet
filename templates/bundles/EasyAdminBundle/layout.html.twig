@@ -23,6 +23,7 @@
 
 		{% block head_stylesheets %}
 			<link rel="stylesheet" href="{{ asset('app.css', ea.assets.defaultAssetPackageName) }}">
+			<link rel="stylesheet" href="https://unpkg.com/highlight.js@11.9.0/styles/github-dark.css">
 		{% endblock %}
 
 		{% block configured_stylesheets %}
@@ -384,7 +385,14 @@
 					</div>
 				{% endblock wrapper_wrapper %}
 
-				{% block body_javascript %}{% endblock body_javascript %}
+				{% block body_javascript %}
+				{{ importmap('admin/highlight') }}
+
+				<script>
+					hljs.highlightAll();
+				</script>
+				{% endblock %}
+
 
 				{% block configured_body_contents %}
 					{% for htmlContent in ea.assets.bodyContents ?? [] %}
