@@ -19,32 +19,25 @@ final class ServicesController extends AbstractController
         ]);
     }
 
-    #Retourne sous forme de json les données d'une station donnée
-    #[Route('/donnees/{station}', name: 'donnees_station')]
-    public function station(ApimeteocentreService $client, string $stationKey, string $stationId): JsonResponse
-    {
-        try {
-            $data = $client->getStationData($stationKey, $stationId);
-            return $this->json($data);
-        } catch (\Throwable $e) {
-            return $this->json(['error' => $e->getMessage()], 500);
-        }
-    }
+    // #Retourne sous forme de json les données d'une station donnée
+    // #[Route('/donnees/{station}', name: 'donnees_station')]
+    // public function station(ApimeteocentreService $client, string $stationKey, string $stationId): JsonResponse
+    // {
+    //     try {
+    //         $data = $client->getStationData($stationKey, $stationId);
+    //         return $this->json($data);
+    //     } catch (\Throwable $e) {
+    //         return $this->json(['error' => $e->getMessage()], 500);
+    //     }
+    // }
 
     // Retourne les details d'une station donnée
     #[Route('/station', name: 'weather_stations')]
-    public function stations(ApimeteocentreService $client, WeatherLinkService $weatherLinkService): JsonResponse
+    public function stations(ApimeteocentreService $client): JsonResponse
     {
-
-        $apiKey = $_ENV['LIGAIR_API_KEY'];
-        $apiSecret = $_ENV['LIGAIR_API_SECRET'];
-
-        $stations = $weatherLinkService->getStations($apiKey, $apiSecret);
-
-        dd($stations);
+        $data = $client->getStations();
 
         try {
-            $data = $client->getStations();
             return $this->json($data);
         } catch (\Throwable $e) {
             return $this->json(['error' => $e->getMessage()], 500);

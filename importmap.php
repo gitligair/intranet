@@ -32,4 +32,7 @@ return [
         'path' => 'assets/admin/highlight.js',
         'entrypoint' => true,
     ],
+    'ckeditor4' => [
+        'version' => '4.25.1',
+    ],
 ];

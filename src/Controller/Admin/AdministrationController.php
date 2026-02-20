@@ -12,6 +12,7 @@ use App\Entity\Services;
 use App\Entity\Categorie;
 use App\Entity\Processus;
 use App\Entity\Accessoire;
+use App\Entity\BaseDeDonnees;
 use App\Entity\BaseScript;
 use App\Entity\Ordinateur;
 use App\Entity\TaillePouce;
@@ -24,7 +25,6 @@ use Symfony\Component\HttpFoundation\Response;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
-use EasyCorp\Bundle\EasyAdminBundle\Security\Permission;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 
@@ -64,7 +64,7 @@ class AdministrationController extends AbstractDashboardController
         return [
             MenuItem::linkToDashboard('Tableau de bord', 'fa fa-home'),
             MenuItem::section('Organisation'),
-            MenuItem::linkToRoute('Formulaire Agile', 'fa fa-user', 'forumlaire_agile'),
+            MenuItem::linkToRoute('Formulaire Agile', 'fa fa-user', 'formulaire_agile'),
             // MenuItem::linkToRoute('Planning hebdomadaire', 'fa fa-calendar-week', 'admin_planning'),
             MenuItem::linkToRoute('Planning par personne', 'fa fa-user', 'admin_planning_grille'),
             // MenuItem::linkToRoute('📊 Planning par pôle', 'fa fa-building', 'admin_planning_recap_poles'),
@@ -84,6 +84,7 @@ class AdministrationController extends AbstractDashboardController
                 MenuItem::linkToCrud('Types de matériel', 'fa-solid fa-box', TypeMateriel::class),
             ]),
             MenuItem::linkToCrud('Liste des scripts', 'fa-solid fa-house-laptop', BaseScript::class),
+            MenuItem::linkToCrud('Les bases de données', 'fa-solid fa-database', BaseDeDonnees::class),
 
             MenuItem::section('Matériels informatiques'),
             MenuItem::subMenu('Désignations', 'fa-brands fa-typo3')->setSubItems([

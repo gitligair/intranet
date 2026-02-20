@@ -6,6 +6,9 @@
 parameters:
   locale: "fr"
   scripts_directory: "%kernel.project_dir%/public/uploads/scripts"
+  meteo_france_token: "%env(METEO_FRANCE_TOKEN)%"
+  meteo_france_user: "%env(METEO_FRANCE_USER)%"
+  meteo_france_base_url: "%env(METEO_FRANCE_BASE_URL)%"
 
 services:
   # default configuration for services in *this* file
@@ -41,3 +44,10 @@ services:
   App\Controller\Admin\BaseScriptCrudController:
     arguments:
       $scriptsDirectory: "%scripts_directory%"
+
+  App\Services\MeteoFranceService:
+    arguments:
+      $meteoFranceToken: "%meteo_france_token%"
+      $meteoFranceUser: "%meteo_france_user%"
+      $meteoFranceBaseUrl: "%meteo_france_base_url%"
+      $connection: "@doctrine.dbal.pgsql_connection"

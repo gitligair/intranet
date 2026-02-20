@@ -50,28 +50,46 @@ class ApimeteocentreService
     // Fonction qui retourne les information d'une station donnée
     public function getStations(): array
     {
-        $station = $this->stations['ligair']; // choix station propriétaire
+        $station = $this->stations['ligair'];
+        // timestamp UTC actuel
+        $t = (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))->getTimestamp();
 
-        $t = time();
+        // paramètres API
+        $queryParams = [
+            'api-key' => $station['apiKey'], // TA clé API
+            't' => $t,
+        ];
 
-        // CHAÎNE à signer exactement
-        $stringToSign = 'api-key=' . $station['apiKey'] . '&t=' . $t;
+        // tri alphabétique OBLIGATOIRE
+        ksort($queryParams);
 
-        // signature HMAC SHA256 avec le secret
+        // génération query string RFC3986
+        $queryString = http_build_query($queryParams, '', '&', PHP_QUERY_RFC3986);
+
+        // CHAÎNE à signer (exactement 4 lignes)
+        $stringToSign = implode("\n", [
+            'GET',                        // méthode HTTP
+            'api.weatherlink.com',        // host
+            '/v2/stations',               // endpoint path
+            $queryString                  // query string triée
+        ]);
+
+        // signature HMAC SHA256 avec LE SECRET de ton compte
         $signature = hash_hmac('sha256', $stringToSign, $station['apiSecret']);
 
         // URL complète
         $url = 'https://api.weatherlink.com/v2/stations';
 
+        // appel HTTP GET
         $response = $this->httpClient->request('GET', $url, [
             'query' => [
-                'api-key' => $station['apiKey'],
-                't' => $t,
+                'api-key'       => $station['apiKey'],
+                't'             => $t,
                 'api-signature' => $signature,
             ],
         ]);
 
-        $data = $response->toArray();
+        // décoder JSON
         return $response->toArray();
     }
 

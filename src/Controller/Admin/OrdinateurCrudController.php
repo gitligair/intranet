@@ -25,6 +25,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\NumericFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\DateTimeFilter;
 
 class OrdinateurCrudController extends AbstractCrudController
@@ -55,6 +56,7 @@ class OrdinateurCrudController extends AbstractCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
+            ->add('types', 'Categorie')
             ->add(BooleanFilter::new('isStock', 'En stock'))
             ->add(NumericFilter::new('ram', 'RAM (Go)'))
             ->add(NumericFilter::new('stockage', 'Stockage (Go)'))
@@ -70,7 +72,8 @@ class OrdinateurCrudController extends AbstractCrudController
             FormField::addPanel('Données Générales')->setIcon('fa fa-box'),
             AssociationField::new('types', 'Catégorie')
                 ->setColumns(4)
-                ->setHelp('Exemple : Pc ou serveur Rack'),
+                ->setHelp('Exemple : Pc ou serveur Rack')
+                ->hideOnIndex(),
             AssociationField::new('sousCatPoste', 'Sous-catégorie')
                 ->setColumns(4)
                 ->setHelp('Exemple : Fixe ou Portable')

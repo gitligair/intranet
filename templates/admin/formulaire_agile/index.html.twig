@@ -1,560 +1,567 @@
 {% extends '@EasyAdmin/page/content.html.twig' %}
 
-{% block page_title %}Formulaire Agile
-{% endblock %}
-{% block content_title %}Formulaire Agile
-{% endblock %}
-
+{% block page_title %}Formulaire Agile{% endblock %}
+{% block content_title %}Formulaire Agile{% endblock %}
 
 {% block main %}
 
-	{% block page_actions %}
-		<a class="btn btn-info" href="{{ ea_url().setController('App\\\\Controller\\\\Admin\\\\FormulaireCrudController').setAction('index') }}">
-			Liste des formulaires créés
-		</a>
-	{% endblock %}
-	<style>
-		/* --- look épuré --- */
-		.word-card {
-			border: 1px solid #e7e7e7;
-			border-radius: 10px;
-			background: #fff;
-		}
-		.word-card-title {
-			padding: 10px 12px;
-			font-weight: 600;
-			background: #fafafa;
-			border-bottom: 1px solid #ececec;
-			border-top-left-radius: 10px;
-			border-top-right-radius: 10px;
-			font-size: 13px;
-			letter-spacing: 0.2px;
-			text-transform: uppercase;
-		}
-		.word-card-body {
-			padding: 12px;
-		}
+{% block page_actions %}
+<a class="btn btn-info"
+	href="{{ ea_url().setController('App\\\\Controller\\\\Admin\\\\FormulaireCrudController').setAction('index') }}">
+	Liste des formulaires créés
+</a>
+{% endblock %}
 
-		.pole-card {
-			border: 1px solid #ededed;
-			border-radius: 12px;
-			background: #fff;
-			box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
-		}
-		.pole-card-body {
-			padding: 12px;
-		}
+<style>
+	/* ===== GENERAL ===== */
+	.word-card {
+		border: 1px solid #e7e7e7;
+		border-radius: 10px;
+		background: #fff;
+		margin-bottom: 14px;
+	}
 
-		.pole-header {
-			display: flex;
-			justify-content: space-between;
-			align-items: flex-start;
-			gap: 10px;
-			margin-bottom: 10px;
-		}
-		.pole-name {
-			font-weight: 600;
-			font-size: 13px;
-			line-height: 1.2;
-		}
-		.pole-meta {
-			font-size: 12px;
-			color: #6b7280;
-			margin-top: 3px;
-		}
+	.word-card-title {
+		padding: 10px 12px;
+		font-weight: 600;
+		background: #fafafa;
+		border-bottom: 1px solid #ececec;
+		border-radius: 10px 10px 0 0;
+		font-size: 13px;
+		text-transform: uppercase;
+		letter-spacing: 0.2px;
+	}
 
-		.btn-word {
-			border: 1px solid #d7d7d7;
-			background: #fff;
-			padding: 6px 10px;
-			border-radius: 10px;
-			font-size: 13px;
-			font-weight: 700;
-		}
-		.btn-word:hover {
-			background: #f7f7f7;
-		}
+	.word-card-body {
+		padding: 12px;
+	}
 
-		.word-table {
-			width: 100%;
-			border-collapse: collapse;
-			table-layout: fixed;
-		}
-		.word-table th,
-		.word-table td {
-			border: 1px solid #ededed;
-			padding: 6px;
-			vertical-align: top;
-			font-size: 13px;
-		}
-		.word-table th {
-			background: #fbfbfb;
-			font-weight: 800;
-			color: #374151;
-		}
+	.word-input,
+	.word-select,
+	.word-textarea {
+		width: 100%;
+		border: 1px solid #e3e3e3;
+		border-radius: 8px;
+		padding: 6px 8px;
+		font-size: 13px;
+	}
 
-		.word-input,
-		.word-select {
-			width: 100%;
-			border: 1px solid #e3e3e3;
-			border-radius: 8px;
-			padding: 6px 8px;
-			font-size: 13px;
-			background: #fff;
-		}
-		.word-input:focus,
-		.word-select:focus {
-			outline: none;
-			border-color: #c9c9c9;
-		}
+	.word-input:focus,
+	.word-select:focus,
+	.word-textarea:focus {
+		outline: none;
+		border-color: #c9c9c9;
+	}
 
-		.btn-icon {
-			border: 1px solid #f0caca;
-			background: #fff;
-			padding: 4px 8px;
-			border-radius: 10px;
-		}
-		.btn-icon:hover {
-			background: #fff5f5;
-		}
-		.tache-num {
-			font-weight: 800;
-			color: #374151;
-		}
-		.tache-card {
-			border: 1px solid #e5e7eb;
-			border-radius: 10px;
-			padding: 10px;
-			background: #fafafa;
-		}
+	/* ===== POLE CARD ===== */
+	.pole-card {
+		border-radius: 14px;
+		border: 1px solid #e5e7eb;
+		margin-bottom: 12px;
+		transition: 0.2s;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+		position: relative;
+	}
 
-		.tache-header {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			margin-bottom: 8px;
-		}
+	.pole-card:hover {
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+	}
 
-		.tache-title {
-			font-weight: 700;
-			font-size: 13px;
-			color: #374151;
-		}
+	.pole-header {
+		padding: 12px 14px;
+		background: #f9fafb;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		cursor: pointer;
+	}
 
-		.tache-num {
-			color: #111827;
-		}
-	</style>
+	.pole-name {
+		font-weight: 600;
+		font-size: 1rem;
+	}
 
+	.pole-meta {
+		font-size: 0.75rem;
+		color: #6b7280;
+	}
 
-	<div class="w-100">
-		<form method="post" action="">
-			<input
-			type="hidden" name="_token" value="{{ csrf_token('formulaire_agile_create') }}">
+	.pole-card.collapsed .pole-body {
+		display: none;
+	}
 
-			{# 1) Infos réunion (table style Word) #}
-			<div class="word-card">
-				<div class="word-card-title">Formulaire réunion hebdomadaire d’équipe</div>
-				<div class="word-card-body">
-					<table
-						class="word-table">
-						{# Infos reunion #}
-						<tr>
-							<td style="width: 25%;">
-								<div class="word-label">Date</div>
-								<input class="word-input" type="date" name="dateReunion" required>
-							</td>
-							<td style="width: 25%;">
-								<div class="word-label">Heure</div>
-								<input class="word-input" type="time" name="heureReunion">
-							</td>
-							<td style="width: 25%;">
-								<div class="word-label">Animateur</div>
-								<select class="word-select" name="animateurId">
-									<option value="">-- Choisir --</option>
-									{% for u in users %}
-										<option value="{{ u.id }}">{{ u.nom }}
-											{{ u.prenom }}</option>
-									{% endfor %}
-								</select>
-							</td>
-							<td style="width: 25%;">
-								<div class="word-label">Réunion tenue ?</div>
-								<label class="word-checkbox">
-									<input type="checkbox" name="reunionTenue" value="1">
-									<span>Oui</span>
-								</label>
-							</td>
-						</tr>
-						{# Participants #}
-						<tr>
-							<td colspan="4">
-								<div class="word-label">Participants (initiales / noms)</div>
+	/* ===== POINTS CLES ===== */
+	.points-cles-card {
+		background: #f9fafb;
+		border: 1px dashed #e5e7eb;
+		border-radius: 10px;
+		padding: 10px;
+		margin-top: 10px;
+	}
+
+	/* ===== TACHES PRIORITAIRES ===== */
+	.tache-card {
+		background: #fff;
+		border-radius: 12px;
+		border: 1px solid #e5e7eb;
+		padding: 10px;
+		margin-bottom: 8px;
+	}
+
+	.tache-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 6px;
+	}
+
+	.tache-title {
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: #374151;
+	}
+
+	.tache-num {
+		background: #e5e7eb;
+		border-radius: 6px;
+		padding: 2px 6px;
+		font-size: 0.7rem;
+	}
+
+	.btn-word {
+		font-size: 0.75rem;
+		padding: 6px 10px;
+		border-radius: 8px;
+		font-weight: 600;
+	}
+
+	.btn-icon {
+		background-color: #fff;
+		border: 1px solid #ddd;
+		border-radius: 50%;
+		width: 28px;
+		height: 28px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 0.9rem;
+		color: #ef4444;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+		line-height: 1;
+	}
+
+	.btn-icon:hover {
+		background-color: #ef4444;
+		color: #fff;
+		transform: scale(1.1);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+	}
+
+	.btn-icon:active {
+		transform: scale(0.95);
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+	}
+
+	.actions-bottom {
+		margin-top: 20px;
+	}
+</style>
+
+<div class="w-100">
+	{% for label, messages in app.flashes %}
+	{% for message in messages %}
+	<div class="alert alert-{{ label }} mb-3">{{ message }}</div>
+	{% endfor %}
+	{% endfor %}
+	<form method="post" action="{{ path('admin_formulaire_agile_create') }}" id="formAgile">
+		<input type="hidden" name="_token" value="{{ csrf_token('formulaire_agile_create') }}">
+
+		{# --- Infos réunion --- #}
+		<div class="word-card">
+			<div class="word-card-title">Formulaire réunion hebdomadaire d’équipe</div>
+			<div class="word-card-body">
+				<div class="row justify-content-start my-2">
+					<div class="col-md-4 my-2">
+						<div class="form-control">
+							<label for="date_jour">Date de reunion</label>
+							<input type="date" id="date_jour" name="date_jour" placeholder="now()" class="form-control form-control-sm">
+						</div>
+					</div>
+					<div class="col-md-4 my-2">
+						<div class="form-control">
+							<label for="choix_animateur">Animateur</label>
+							<select id="choix_animateur" class="form-control form-control-sm" name="animateurId">
+								<option value="">-- Choisir --</option>
 								{% for u in users %}
-									{% set prenomInitiale = u.prenom|trim|slice(0,1)|upper %}
-									{% set nomInitiales = '' %}
-
-									{% for part in u.nom|trim|split(' ') %}
-
-										{% set nomInitiales = nomInitiales ~ part|slice(0,1)|upper %}
-									{% endfor %}
-
-									<div class="form-check form-check-inline">
-										<input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="{{u.id}}" name="participantsIds[]">
-										<label class="form-check-label" for="inlineCheckbox1">{{ prenomInitiale }}{{ nomInitiales }}</label>
-
-									</div>
+								<option value="{{ u.id }}">{{ u.nom }} {{ u.prenom }}</option>
 								{% endfor %}
-							</td>
-						</tr>
-						{# Objectifs #}
-						<tr>
-							<td colspan="4">
-								<div class="word-label">Objectifs</div>
-								<input class="word-input" type="text" name="objectifs" placeholder="Objectifs de la réunion">
-							</td>
-						</tr>
-						{# Points clés #}
-						<tr>
-							<td colspan="4">
-								<div class="word-label">Points clés (travaux urgents / importants, difficultés, décisions…)</div>
-								<textarea class="form-control " name="pointsCles"></textarea>
-							</td>
-						</tr>
-					</table>
+							</select>
+						</div>
+					</div>
+					<div class="col-md-4 my-2">
+						<div class="form-control">
+							<label for="reunionTenue">Reunion tenue ?</label>
+							<label class="d-flex align-items-center gap-2" style="cursor:pointer;">
+								<input type="checkbox" name="reunionTenue" value="1">
+								<span>OUI</span>
+							</label>
+						</div>
+					</div>
+
+					<!-- Liste des presents à la reunion -->
+					<div class="col-md-12 my-2">
+						<div class="word-label mb-2" style="font-weight:600;">Présents à la réunion</div>
+		
+						<div class="row g-2">
+							{% for u in users %}
+							<div class="col-md-3 col-sm-6">
+								<label class="d-flex align-items-center gap-2" style="cursor:pointer;">
+									<input type="checkbox" name="presents[]" value="{{ u.id }}">
+									<span>{{ u.nom }} {{ u.prenom }}</span>
+								</label>
+							</div>
+							{% endfor %}
+						</div>
+		
+					</div>
+
 				</div>
+				
 			</div>
+		</div>
 
-			{# 2) Tâches prioritaires par pôle #}
+		{# --- Points clés par pôle (SANS tâches) --- #}
+		<div class="word-card">
+			<div class="word-card-title">Points clés par pôle</div>
+			<div class="word-card-body">
+				<div class="row g-3">
+					{% set colors = ['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#14b8a6'] %}
 
+					{% for pole in poles %}
+					{% set color = colors[loop.index0 % colors|length] %}
 
-			<div class="word-card">
-				<div class="word-card-title">Tâches prioritaires par pôle</div>
-
-				<div class="word-card-body">
-					<div class="row g-3">
-						{% for pole in poles %}
-							<div class="col-md-6">
-								<div class="pole-card">
-									<div class="pole-card-body">
-
-										<div class="pole-header">
-											<div>
-												<div class="pole-name">{{ pole.nom }}</div>
-												<div class="pole-meta">
-													Responsable :
-													{{ pole.responsable ? pole.responsable.nom ~ ' ' ~ pole.responsable.prenom : '—' }}
-													· Personnel :
-													{{ pole.personnel|length }}
-												</div>
-											</div>
-
-											<button type="button" class="btn-word btnAddTachePole" data-pole-id="{{ pole.id }}">
-												+ Tâche
-											</button>
-										</div>
-
-										{# Tâches du pôle #}
-										<div class="tachesTbodyPole" data-pole-id="{{ pole.id }}">
-
-											<div class="tache-row" data-index="0" data-pole-id="{{ pole.id }}">
-
-												<div class="tache-card">
-
-													<div class="tache-header">
-														<span class="tache-title">
-															Tâche
-															<span class="tache-num">1</span>
-														</span>
-
-														<button type="button" class="btn-icon btnRemoveTachePole" title="Supprimer">
-															✕
-														</button>
-													</div>
-
-													<div
-														class="row g-2">
-
-														<!-- Description -->
-														<div class="col-12">
-															<label class="form-label small">Description</label>
-															<input class="word-input" type="text" name="tachesParPole[{{ pole.id }}][0][description]" placeholder="Décrire la tâche">
-														</div>
-
-														<!-- Pilote -->
-														<div class="col-md-4">
-															<label class="form-label small">Pilote</label>
-															<select class="word-select" name="tachesParPole[{{ pole.id }}][0][piloteId]">
-																<option value="">—</option>
-																{% if pole.responsable %}
-																	<option value="{{ pole.responsable.id }}">
-																		{{ pole.responsable.nom }}
-																		{{ pole.responsable.prenom }}
-																		(Resp.)
-																	</option>
-																{% endif %}
-																{% for u in pole.personnel %}
-																	{% set prenomInitiale = u.prenom|slice(0,1)|upper %}
-																	{% set nomInitiales = u.nom|split(' ')|map(p => p|slice(0,1)|upper)|join %}
-																	<option value="{{ u.id }}">{{ prenomInitiale }}{{ nomInitiales }}</option>
-																{% endfor %}
-															</select>
-														</div>
-
-														<!-- Doublon -->
-														<div class="col-md-4">
-															<label class="form-label small">Doublon</label>
-															<select class="word-select" name="tachesParPole[{{ pole.id }}][0][doublonId]">
-																<option value="">—</option>
-																{% if pole.responsable %}
-																	<option value="{{ pole.responsable.id }}">
-																		{{ pole.responsable.nom }}
-																		{{ pole.responsable.prenom }}
-																		(Resp.)
-																	</option>
-																{% endif %}
-																{% for u in pole.personnel %}
-																	{% set prenomInitiale = u.prenom|slice(0,1)|upper %}
-																	{% set nomInitiales = u.nom|split(' ')|map(p => p|slice(0,1)|upper)|join %}
-																	<option value="{{ u.id }}">{{ prenomInitiale }}{{ nomInitiales }}</option>
-																{% endfor %}
-															</select>
-														</div>
-
-														<!-- Délai -->
-														<div class="col-md-3">
-															<label class="form-label small">Délai</label>
-															<input class="word-input" type="datetime-local" name="tachesParPole[{{ pole.id }}][0][delai]">
-														</div>
-
-														<!-- Fait -->
-														<div class="col-md-1 text-center">
-															<label class="form-label small">Fait</label>
-															<input type="checkbox" name="tachesParPole[{{ pole.id }}][0][fait]" value="1">
-														</div>
-
-													</div>
-												</div>
-											</div>
-										</div>
-
-										{# Template for new tache row #}
-										<template id="tpl-row-pole-{{ pole.id }}">
-											<div class="tache-row" data-index="__i__" data-pole-id="{{ pole.id }}">
-
-												<div class="tache-card">
-
-													<div class="tache-header">
-														<span class="tache-title">
-															Tâche
-															<span class="tache-num">__n__</span>
-														</span>
-
-														<button type="button" class="btn-icon btnRemoveTachePole" title="Supprimer">
-															✕
-														</button>
-													</div>
-
-													<div class="row g-2">
-
-														<div class="col-12">
-															<label class="form-label small">Description</label>
-															<input class="word-input" type="text" name="tachesParPole[{{ pole.id }}][__i__][description]">
-														</div>
-
-														<div class="col-md-4">
-															<label class="form-label small">Pilote</label>
-															<select class="word-select" name="tachesParPole[{{ pole.id }}][__i__][piloteId]">
-																<option value="">—</option>
-																{% if pole.responsable %}
-																	<option value="{{ pole.responsable.id }}">
-																		{{ pole.responsable.nom }}
-																		{{ pole.responsable.prenom }}
-																		(Resp.)
-																	</option>
-																{% endif %}
-																{% for u in pole.personnel %}
-																	<option value="{{ u.id }}">{{ u.nom }}
-																		{{ u.prenom }}</option>
-																{% endfor %}
-															</select>
-														</div>
-
-														<div class="col-md-4">
-															<label class="form-label small">Doublon</label>
-															<select class="word-select" name="tachesParPole[{{ pole.id }}][__i__][doublonId]">
-																<option value="">—</option>
-																{% if pole.responsable %}
-																	<option value="{{ pole.responsable.id }}">
-																		{{ pole.responsable.nom }}
-																		{{ pole.responsable.prenom }}
-																		(Resp.)
-																	</option>
-																{% endif %}
-																{% for u in pole.personnel %}
-																	<option value="{{ u.id }}">{{ u.nom }}
-																		{{ u.prenom }}</option>
-																{% endfor %}
-															</select>
-														</div>
-
-														<div class="col-md-3">
-															<label class="form-label small">Délai</label>
-															<input class="word-input" type="datetime-local" name="tachesParPole[{{ pole.id }}][__i__][delai]">
-														</div>
-
-														<div class="col-md-1 text-center">
-															<label class="form-label small">Fait</label>
-															<input type="checkbox" name="tachesParPole[{{ pole.id }}][__i__][fait]" value="1">
-														</div>
-
-													</div>
-												</div>
-											</div>
-										</template>
-
-
+					<div class="col-xl-3 col-lg-4 col-md-6">
+						<div class="pole-card collapsed" style="border-left:6px solid {{ color }};"
+							data-pole-id="{{ pole.id }}">
+							<div class="pole-header">
+								<div>
+									<div class="pole-name">{{ pole.nom }}</div>
+									<div class="pole-meta">
+										Resp.: {{ pole.responsable ? pole.responsable.nom ~ ' ' ~
+										pole.responsable.prenom : '—' }}
+										· {{ pole.personnel|length }} pers.
+										· <span class="points-count">1</span> points clés
 									</div>
 								</div>
+								<div class="toggle-indicator">▸</div>
 							</div>
-						{% endfor %}
 
+							<div class="pole-body p-2">
+
+								<div class="points-cles-card">
+									<div class="d-flex justify-content-between align-items-center mb-2">
+										<div class="section-title">Points clés</div>
+										<button type="button" class="btn-word btnAddPointCle"
+											style="background-color: {{ color }};border:none;color:white;"
+											data-pole-id="{{ pole.id }}">+ Point clé</button>
+									</div>
+
+									<div class="pointsClesBody" data-pole-id="{{ pole.id }}">
+										<div class="point-cle-row" data-index="0">
+											<div class="input-group mb-2">
+												<input type="text" class="form-control"
+													name="pointsClesParPole[{{ pole.id }}][0][texte]"
+													placeholder="Point clé…">
+												<button type="button"
+													class="btn btn-outline-danger btnRemovePointCle">✕</button>
+											</div>
+										</div>
+									</div>
+
+									<template id="tpl-point-cle-{{ pole.id }}">
+										<div class="point-cle-row" data-index="__i__">
+											<div class="input-group mb-2">
+												<input type="text" class="form-control"
+													name="pointsClesParPole[{{ pole.id }}][__i__][texte]"
+													placeholder="Point clé…">
+												<button type="button"
+													class="btn btn-outline-danger btnRemovePointCle">✕</button>
+											</div>
+										</div>
+									</template>
+
+								</div>
+
+							</div>
+						</div>
+					</div>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+
+		{# --- Tâches prioritaires générales (SEULES tâches) --- #}
+		<div class="word-card">
+			<div class="word-card-title">Tâches prioritaires (général)</div>
+			<div class="word-card-body">
+
+				<div class="d-flex justify-content-end border-top pt-2 my-2">
+					<button type="button" class="btn-word btnAddTask"
+						style="background-color:#22223ede;border:none;color:#dff163;">+ Ajouter une tâche</button>
+				</div>
+
+				<div class="tasks-container mb-2" data-scope="prioritaire" data-group-id="1">
+					<div class="tache-row" data-index="0" data-scope="prioritaire" data-group-id="1">
+						<div class="tache-card">
+							<div class="tache-header">
+								<span class="tache-title">Tâche <span class="tache-num">1</span></span>
+								<button type="button" class="btn-icon btnRemoveTask" title="Supprimer">✕</button>
+							</div>
+
+							<div class="row g-2">
+								<div class="col-12">
+									<label class="form-label small">Description</label>
+									<input class="word-input" type="text" name="tachesprioritaire[0][description]">
+								</div>
+
+								<div class="col-md-4">
+									<label class="form-label small">Pilote</label>
+									<select class="word-select" name="tachesprioritaire[0][pilote]">
+										<option value="">-- Choisir --</option>
+										{% for u in users %}
+										<option value="{{ u.id }}">{{ u.nom }} {{ u.prenom }}</option>
+										{% endfor %}
+									</select>
+								</div>
+
+								<div class="col-md-4">
+									<label class="form-label small">Doublon</label>
+									<select class="word-select" name="tachesprioritaire[0][doublon]">
+										<option value="">-- Choisir --</option>
+										{% for u in users %}
+										<option value="{{ u.id }}">{{ u.nom }} {{ u.prenom }}</option>
+										{% endfor %}
+									</select>
+								</div>
+
+								<div class="col-md-3">
+									<label class="form-label small">Délai</label>
+									<input class="word-input" type="datetime-local" name="tachesprioritaire[0][delai]">
+								</div>
+
+								<div class="col-md-1 text-center">
+									<label class="form-label small">Fait</label>
+									<input type="checkbox" name="tachesprioritaire[0][fait]" value="1">
+								</div>
+							</div>
+
+						</div>
 					</div>
 				</div>
+
+				<template id="tpl-task-prioritaire-1">
+					<div class="tache-row" data-index="__i__" data-scope="prioritaire" data-group-id="1">
+						<div class="tache-card">
+							<div class="tache-header">
+								<span class="tache-title">Tâche <span class="tache-num">__n__</span></span>
+								<button type="button" class="btn-icon btnRemoveTask" title="Supprimer">✕</button>
+							</div>
+
+							<div class="row g-2">
+								<div class="col-12">
+									<label class="form-label small">Description</label>
+									<input class="word-input" type="text" name="tachesprioritaire[__i__][description]">
+								</div>
+
+								<div class="col-md-4">
+									<label class="form-label small">Pilote</label>
+									<select class="word-select" name="tachesprioritaire[__i__][pilote]">
+										<option value="">-- Choisir --</option>
+										{% for u in users %}
+										<option value="{{ u.id }}">{{ u.nom }} {{ u.prenom }}</option>
+										{% endfor %}
+									</select>
+								</div>
+
+								<div class="col-md-4">
+									<label class="form-label small">Doublon</label>
+									<select class="word-select" name="tachesprioritaire[__i__][doublon]">
+										<option value="">-- Choisir --</option>
+										{% for u in users %}
+										<option value="{{ u.id }}">{{ u.nom }} {{ u.prenom }}</option>
+										{% endfor %}
+									</select>
+								</div>
+
+								<div class="col-md-3">
+									<label class="form-label small">Délai</label>
+									<input class="word-input" type="datetime-local"
+										name="tachesprioritaire[__i__][delai]">
+								</div>
+
+								<div class="col-md-1 text-center">
+									<label class="form-label small">Fait</label>
+									<input type="checkbox" name="tachesprioritaire[__i__][fait]" value="1">
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</template>
+
 			</div>
+		</div>
 
+		<div class="actions-bottom">
+			<button class="btn btn-primary my-2" type="submit">Créer</button>
+		</div>
 
-			{# 3) Partage & Suivi (style Word) #}
-			<div class="word-card">
-				<div class="word-card-title">Partage d’information & Suivi</div>
-				<div class="word-card-body">
-					<table class="word-table">
-						<tr>
-							<td colspan="2">
-								<div class="word-label">Partage d’information dans les équipes</div>
-								<textarea class="word-textarea" name="partageInformation"></textarea>
-							</td>
-						</tr>
+	</form>
+</div>
 
-						<tr>
-							<td style="width: 50%;">
-								<div class="word-label">Prochaine réunion (date/heure)</div>
-								<input class="word-input" type="datetime-local" name="prochaineReunionAt">
-							</td>
-							<td style="width: 50%;">
-								<div class="word-label">Animateur prochaine réunion</div>
-								<select class="word-select" name="prochainAnimateurId">
-									<option value="">-- Choisir --</option>
-									{% for u in users %}
-										<option value="{{ u.id }}">{{ u.nom }}
-											{{ u.prenom }}</option>
-									{% endfor %}
-								</select>
-							</td>
-						</tr>
+<script>
+	(function () {
 
-						<tr>
-							<td colspan="2">
-								<div class="word-label">Suivi / commentaires (facultatif)</div>
-								<textarea class="word-textarea" name="suiviCommentaires"></textarea>
-							</td>
-						</tr>
-					</table>
-				</div>
-			</div>
+		// ===== Collapsible pôles =====
+		document.querySelectorAll('.pole-header').forEach(header => {
+			header.addEventListener('click', function () {
+				const card = header.closest('.pole-card');
+				card.classList.toggle('collapsed');
+				const indicator = header.querySelector('.toggle-indicator');
+				if (indicator) indicator.textContent = card.classList.contains('collapsed') ? '▸' : '▾';
+			});
+		});
 
-			<div class="actions-bottom">
-				<button class="btn btn-primary my-2" type="submit">Créer</button>
-			</div>
+		// ===== Counters points clés =====
+		function updatePolePointsCounter(poleId) {
+			const pole = document.querySelector('.pole-card[data-pole-id="' + poleId + '"]');
+			if (!pole) return;
+			const points = pole.querySelectorAll('.point-cle-row').length;
+			const pointsCount = pole.querySelector('.points-count');
+			if (pointsCount) pointsCount.textContent = points;
+		}
 
-		</form>
-	</div>
+		// ===== Points clés add/remove =====
+		function addPointCle(poleId) {
+			const container = document.querySelector('.pointsClesBody[data-pole-id="' + poleId + '"]');
+			const template = document.getElementById('tpl-point-cle-' + poleId);
+			if (!container || !template) return;
 
-	<script>
-		(function () {
+			const index = container.querySelectorAll('.point-cle-row').length;
+			container.insertAdjacentHTML('beforeend', template.innerHTML.replace(/__i__/g, index));
+			updatePolePointsCounter(poleId);
+		}
 
-function renumberPole(poleId) {
-const tbody = document.querySelector('.tachesTbodyPole[data-pole-id="' + poleId + '"]');
-if (! tbody) 
-return;
+		function removePointCle(btnEl) {
+			const container = btnEl.closest('.pointsClesBody');
+			if (!container) return;
 
+			const poleId = container.dataset.poleId;
+			if (container.querySelectorAll('.point-cle-row').length <= 1) return;
 
+			btnEl.closest('.point-cle-row').remove();
+			updatePolePointsCounter(poleId);
+		}
 
-const rows = tbody.querySelectorAll('tr.tache-row');
-rows.forEach((row, idx) => {
-row.dataset.index = String(idx);
-const num = row.querySelector('.tache-num');
-if (num) 
-num.textContent = String(idx + 1);
+		// ===== Tâches prioritaires générales =====
+		function getPrioritaireContainer() {
+			return document.querySelector('.tasks-container[data-scope="prioritaire"][data-group-id="1"]');
+		}
 
+		function addPrioritaireRow() {
+			const container = getPrioritaireContainer();
+			const tpl = document.getElementById('tpl-task-prioritaire-1');
+			if (!container || !tpl) return;
 
+			const i = container.querySelectorAll('.tache-row').length;
+			const html = tpl.innerHTML.replaceAll('__i__', i).replaceAll('__n__', i + 1);
 
-row.querySelectorAll('[name]').forEach(el => {
-el.name = el.name.replace(new RegExp('tachesParPole\\[' + poleId + '\\]\\[\\d+\\]'), 'tachesParPole[' + poleId + '][' + idx + ']');
-});
-});
-}
+			const temp = document.createElement('div');
+			temp.innerHTML = html.trim();
+			container.appendChild(temp.firstElementChild);
+		}
 
-function addRowPole(poleId) {
-const tbody = document.querySelector('.tachesTbodyPole[data-pole-id="' + poleId + '"]');
-const tpl = document.getElementById('tpl-row-pole-' + poleId);
-if (! tbody || ! tpl) 
-return;
+		function renumberPrioritaires() {
+			const container = getPrioritaireContainer();
+			if (!container) return;
 
+			const rows = container.querySelectorAll('.tache-row');
+			rows.forEach((row, idx) => {
+				row.dataset.index = idx;
+				const num = row.querySelector('.tache-num');
+				if (num) num.textContent = idx + 1;
 
+				row.querySelectorAll('[name]').forEach(el => {
+					el.name = el.name.replace(/tachesprioritaire\[\d+\]/, 'tachesprioritaire[' + idx + ']');
+				});
+			});
+		}
 
-const i = tbody.querySelectorAll('tr.tache-row').length;
-const html = tpl.innerHTML.replaceAll('__i__', String(i)).replaceAll('__n__', String(i + 1));
+		function removePrioritaireRow(rowEl) {
+			const container = getPrioritaireContainer();
+			if (!container) return;
 
-const temp = document.createElement('div');
+			if (container.querySelectorAll('.tache-row').length <= 1) {
+				alert('Au moins une tâche doit être présente');
+				return;
+			}
 
+			rowEl.remove();
+			renumberPrioritaires();
+		}
 
-temp.innerHTML = html.trim();
-tbody.appendChild(temp.firstElementChild);
-}
+		// ===== Delegation =====
+		document.addEventListener('click', function (e) {
 
-document.addEventListener('click', function (e) {
-const btnAdd = e.target.closest('.btnAddTachePole');
-if (btnAdd) {
-addRowPole(btnAdd.getAttribute('data-pole-id'));
-return;
-}
+			// Ajouter tâche prioritaire
+			const btnAddTask = e.target.closest('.btnAddTask');
+			if (btnAddTask) {
+				addPrioritaireRow();
+				return;
+			}
 
-const btnRemove = e.target.closest('.btnRemoveTachePole');
-if (btnRemove) {
-const row = btnRemove.closest('.tache-row');
-if (! row) 
-return;
+			// Supprimer tâche prioritaire
+			const btnRemoveTask = e.target.closest('.btnRemoveTask');
+			if (btnRemoveTask) {
+				const row = btnRemoveTask.closest('.tache-row');
+				if (row) removePrioritaireRow(row);
+				return;
+			}
 
+			// Points clés
+			const btnAddPoint = e.target.closest('.btnAddPointCle');
+			if (btnAddPoint) {
+				addPointCle(btnAddPoint.dataset.poleId);
+				return;
+			}
 
+			const btnRemovePoint = e.target.closest('.btnRemovePointCle');
+			if (btnRemovePoint) {
+				removePointCle(btnRemovePoint);
+				return;
+			}
+		});
 
-const poleId = row.getAttribute('data-pole-id');
-const container = document.querySelector('.tachesTbodyPole[data-pole-id="' + poleId + '"]');
+		// Init counters points clés
+		document.querySelectorAll('.pole-card[data-pole-id]').forEach(p => {
+			updatePolePointsCounter(p.dataset.poleId);
+		});
 
-if (! container) 
-return;
-
-
-
-const rows = container.querySelectorAll('.tache-row');
-
-// ⛔ Bloque la suppression s'il ne reste qu'une tâche
-if (rows.length <= 1) {
-// Option simple (silencieuse)
-// return;
-
-// Option UX (recommandée)
-alert('Au moins une tâche doit être présente pour ce pôle.');
-return;
-}
-
-row.remove();
-renumberPole(poleId);
-}
-
-});
-
-})();
-	</script>
-
+	})();
+</script>
+<script>
+	(function () {
+		const form = document.getElementById('formAgile');
+		if (form) {
+			form.addEventListener('submit', function (e) {
+				const ok = confirm("Confirmer l’envoi du formulaire ?");
+				if (!ok) e.preventDefault();
+			});
+		}
+	})();
+</script>
 {% endblock %}

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\OrdinateurRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -16,9 +18,6 @@ class Ordinateur extends Materiel
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $processeur = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $os = null;
 
     #[ORM\Column]
     private ?float $ram = null;
@@ -48,6 +47,17 @@ class Ordinateur extends Materiel
     #[ORM\ManyToOne(inversedBy: 'ordinateurs')]
     private ?Os $systemeExploitation = null;
 
+    /**
+     * @var Collection<int, BaseDeDonnees>
+     */
+    #[ORM\OneToMany(targetEntity: BaseDeDonnees::class, mappedBy: 'localisation')]
+    private Collection $baseDeDonnees;
+
+    public function __construct()
+    {
+        $this->baseDeDonnees = new ArrayCollection();
+    }
+
 
     public function getModele(): ?string
     {
@@ -70,18 +80,6 @@ class Ordinateur extends Materiel
     public function setProcesseur(?string $processeur): static
     {
         $this->processeur = $processeur;
-
-        return $this;
-    }
-
-    public function getOs(): ?string
-    {
-        return $this->os;
-    }
-
-    public function setOs(string $os): static
-    {
-        $this->os = $os;
 
         return $this;
     }
@@ -147,7 +145,7 @@ class Ordinateur extends Materiel
     }
     public function __toString(): string
     {
-        return $this->getType()->getNom() . ' - ' . $this->getModele() . ' ' . $this->getIdentifiant();
+        return $this->getNom() . ' - ' . $this->getModele() . ' ' . $this->getIdentifiant();
     }
 
     public function getTaillePouce(): ?TaillePouce
@@ -194,6 +192,36 @@ class Ordinateur extends Materiel
     public function setSystemeExploitation(?Os $systemeExploitation): static
     {
         $this->systemeExploitation = $systemeExploitation;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BaseDeDonnees>
+     */
+    public function getBaseDeDonnees(): Collection
+    {
+        return $this->baseDeDonnees;
+    }
+
+    public function addBaseDeDonnee(BaseDeDonnees $baseDeDonnee): static
+    {
+        if (!$this->baseDeDonnees->contains($baseDeDonnee)) {
+            $this->baseDeDonnees->add($baseDeDonnee);
+            $baseDeDonnee->setLocalisation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBaseDeDonnee(BaseDeDonnees $baseDeDonnee): static
+    {
+        if ($this->baseDeDonnees->removeElement($baseDeDonnee)) {
+            // set the owning side to null (unless already changed)
+            if ($baseDeDonnee->getLocalisation() === $this) {
+                $baseDeDonnee->setLocalisation(null);
+            }
+        }
 
         return $this;
     }
