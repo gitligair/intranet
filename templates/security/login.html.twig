@@ -1,210 +1,425 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Connexion
-{% endblock %}
+{% block title %}Connexion{% endblock %}
 
 {% block body %}
+<style>
+	:root {
+		--bg-1: #0b2f4a;
+		--bg-2: #164d73;
+		--bg-3: #2f88b9;
+		--accent: #22c1c3;
+		--accent-2: #4f8cff;
+		--text: #f8fbff;
+		--muted: rgba(255, 255, 255, 0.72);
+		--line: rgba(255, 255, 255, 0.14);
+		--input-bg: rgba(255, 255, 255, 0.08);
+		--input-focus: rgba(255, 255, 255, 0.12);
+		--card-bg: rgba(10, 22, 35, 0.34);
+		--shadow: 0 20px 60px rgba(0, 0, 0, 0.30);
+		--radius: 24px;
+	}
 
-	<style>
-		body {
-			margin: 0 !important;
-			padding: 0 !important;
-			overflow: hidden;
-			font-family: 'Inter', sans-serif;
-			background: linear-gradient(135deg, #0E3B64, #6ED6FF);
+	* {
+		box-sizing: border-box;
+	}
+
+	html,
+	body {
+		margin: 0;
+		padding: 0;
+		min-height: 100%;
+		font-family: Inter, sans-serif;
+	}
+
+	body {
+		background:
+			radial-gradient(circle at top left, rgba(110, 214, 255, 0.18), transparent 30%),
+			radial-gradient(circle at bottom right, rgba(34, 193, 195, 0.16), transparent 25%),
+			linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 48%, var(--bg-3) 100%);
+		color: var(--text);
+		overflow: hidden;
+	}
+
+	.auth-shell {
+		position: relative;
+		min-height: 100vh;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 32px 20px;
+	}
+
+	.auth-shell::before,
+	.auth-shell::after {
+		content: "";
+		position: absolute;
+		border-radius: 999px;
+		filter: blur(50px);
+		opacity: 0.45;
+		pointer-events: none;
+	}
+
+	.auth-shell::before {
+		width: 260px;
+		height: 260px;
+		background: rgba(79, 140, 255, 0.28);
+		top: 8%;
+		left: 8%;
+	}
+
+	.auth-shell::after {
+		width: 320px;
+		height: 320px;
+		background: rgba(34, 193, 195, 0.20);
+		bottom: 6%;
+		right: 8%;
+	}
+
+	.auth-card {
+		position: relative;
+		z-index: 1;
+		width: 100%;
+		max-width: 430px;
+		padding: 34px 32px 26px;
+		border-radius: var(--radius);
+		background: var(--card-bg);
+		backdrop-filter: blur(18px);
+		-webkit-backdrop-filter: blur(18px);
+		border: 1px solid var(--line);
+		box-shadow: var(--shadow);
+		animation: cardIn .45s ease;
+	}
+
+	.brand {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		margin-bottom: 28px;
+	}
+
+	.brand-logo-wrap {
+		width: 84px;
+		height: 84px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 22px;
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.10);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+		margin-bottom: 18px;
+	}
+
+	.brand-logo {
+		max-width: 58px;
+		height: auto;
+		display: block;
+	}
+
+	.brand-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 6px 12px;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		font-size: 0.74rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: #d7f7ff;
+		margin-bottom: 14px;
+	}
+
+	.brand-title {
+		margin: 0;
+		font-size: 1.95rem;
+		font-weight: 800;
+		line-height: 1.05;
+		letter-spacing: -0.03em;
+		color: #ffffff;
+	}
+
+	.brand-title .accent {
+		background: linear-gradient(135deg, #8eeeff 0%, #4ccfd4 40%, #79a8ff 100%);
+		-webkit-background-clip: text;
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+	}
+
+	.brand-subtitle {
+		margin: 10px 0 0;
+		font-size: 0.97rem;
+		line-height: 1.5;
+		color: var(--muted);
+		max-width: 290px;
+	}
+
+	.alert {
+		border-radius: 14px;
+		padding: 12px 14px;
+		font-size: 0.92rem;
+		margin-bottom: 16px;
+		border: 1px solid transparent;
+	}
+
+	.alert-danger {
+		background: rgba(255, 99, 132, 0.10);
+		border-color: rgba(255, 99, 132, 0.20);
+		color: #ffdce5;
+	}
+
+	.alert-info {
+		background: rgba(79, 140, 255, 0.10);
+		border-color: rgba(79, 140, 255, 0.20);
+		color: #dce8ff;
+	}
+
+	.form-stack {
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+	}
+
+	.field {
+		position: relative;
+	}
+
+	.field-label {
+		display: block;
+		margin-bottom: 8px;
+		font-size: 0.88rem;
+		font-weight: 600;
+		color: rgba(255, 255, 255, 0.88);
+		text-align: left;
+	}
+
+	.input-wrap {
+		position: relative;
+	}
+
+	.input-icon {
+		position: absolute;
+		left: 14px;
+		top: 50%;
+		transform: translateY(-50%);
+		font-size: 1rem;
+		opacity: 0.9;
+		pointer-events: none;
+	}
+
+	.form-control {
+		width: 100%;
+		height: 52px;
+		padding: 0 48px 0 44px;
+		border-radius: 14px;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		background: var(--input-bg);
+		color: #fff;
+		outline: none;
+		font-size: 0.97rem;
+		transition: all 0.18s ease;
+	}
+
+	.form-control::placeholder {
+		color: rgba(255, 255, 255, 0.48);
+	}
+
+	.form-control:focus {
+		background: var(--input-focus);
+		border-color: rgba(110, 214, 255, 0.6);
+		box-shadow: 0 0 0 4px rgba(110, 214, 255, 0.12);
+	}
+
+	.password-toggle {
+		position: absolute;
+		right: 14px;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 30px;
+		height: 30px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 8px;
+		cursor: pointer;
+		font-size: 1rem;
+		color: rgba(255, 255, 255, 0.9);
+		transition: background 0.15s ease;
+		user-select: none;
+	}
+
+	.password-toggle:hover {
+		background: rgba(255, 255, 255, 0.08);
+	}
+
+	.actions {
+		margin-top: 8px;
+	}
+
+	.btn-submit {
+		width: 100%;
+		height: 52px;
+		border: none;
+		border-radius: 14px;
+		background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+		color: #fff;
+		font-size: 0.98rem;
+		font-weight: 700;
+		letter-spacing: 0.01em;
+		cursor: pointer;
+		box-shadow: 0 10px 24px rgba(34, 193, 195, 0.20);
+		transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
+	}
+
+	.btn-submit:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 16px 28px rgba(34, 193, 195, 0.24);
+	}
+
+	.btn-submit:active {
+		transform: translateY(0);
+	}
+
+	.session-box {
+		margin-top: 14px;
+		font-size: 0.92rem;
+		line-height: 1.5;
+	}
+
+	.session-box a {
+		color: #a9ecff;
+		font-weight: 600;
+		text-decoration: none;
+	}
+
+	.session-box a:hover {
+		text-decoration: underline;
+	}
+
+	.auth-footer {
+		position: absolute;
+		bottom: 18px;
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 1;
+		font-size: 0.82rem;
+		color: rgba(255, 255, 255, 0.62);
+		text-align: center;
+		letter-spacing: 0.02em;
+	}
+
+	@keyframes cardIn {
+		from {
+			opacity: 0;
+			transform: translateY(16px) scale(0.98);
 		}
 
-		.glass-wrapper {
-			position: fixed;
-			inset: 0;
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			align-items: center;
-			padding: 20px;
+		to {
+			opacity: 1;
+			transform: translateY(0) scale(1);
+		}
+	}
+
+	@media (max-width: 576px) {
+		.auth-card {
+			padding: 26px 20px 22px;
+			border-radius: 20px;
 		}
 
-		.glass-card {
-			max-width: 500px;
-			padding: 2.8rem 2.5rem;
-			border-radius: 18px;
-			backdrop-filter: blur(18px);
-			background: rgba(255, 255, 255, 0.14);
-			border: 1px solid rgba(255, 255, 255, 0.22);
-			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-			color: #fff;
-			animation: fadeIn 0.6s ease-out;
-			text-align: center;
+		.brand-title {
+			font-size: 1.7rem;
 		}
 
-		.glass-logo {
-			width: 120px;
-			height: auto;
-			margin-bottom: 1rem;
-			filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));
+		.brand-subtitle {
+			font-size: 0.92rem;
 		}
 
-		.glass-title-main {
-			font-size: 1.45rem;
-			font-weight: 600;
-			margin-bottom: 1.8rem;
-			text-transform: uppercase;
-			letter-spacing: 0.7px;
-			color: #dff8ff;
+		.auth-footer {
+			width: calc(100% - 24px);
+			font-size: 0.78rem;
 		}
+	}
+</style>
 
-		/* Input group */
-		.input-group {
-			position: relative;
-			margin-bottom: 1rem;
-		}
+<div class="auth-shell">
+	<div class="auth-card">
+		<div class="brand">
+			<div class="brand-logo-wrap">
+				<img src="{{ asset('images/logos/ligair_intra.png') }}" alt="LigAir" class="brand-logo">
+			</div>
 
-		.input-icon {
-			position: absolute;
-			left: 12px;
-			top: 50%;
-			transform: translateY(-50%);
-			opacity: 0.9;
-			font-size: 18px;
-			pointer-events: none;
-			color: #dffaff;
-		}
+			<div class="brand-badge">Espace sécurisé</div>
 
-		.form-control {
-			width: 100%;
-			padding: 0.65rem 0.85rem 0.65rem 2.7rem;
-			background: rgba(255, 255, 255, 0.15);
-			border: 1px solid rgba(255, 255, 255, 0.3);
-			color: #fff;
-			border-radius: 8px;
-			transition: background 0.2s, border-color 0.2s;
-		}
+			<h1 class="brand-title">
+				Lig<span class="accent">Air</span>
+			</h1>
 
-		.form-control:focus {
-			background: rgba(255, 255, 255, 0.23);
-			border-color: #4CD4CB;
-			box-shadow: 0 0 0 0.15rem rgba(76, 212, 203, 0.35);
-		}
+			<p class="brand-subtitle">
+				Connectez-vous à l’intranet pour accéder à votre espace de travail.
+			</p>
+		</div>
 
-		.form-control::placeholder {
-			color: rgba(255, 255, 255, 0.7);
-		}
+		{% if error %}
+		<div class="alert alert-danger">
+			{{ error.messageKey|trans(error.messageData, 'security') }}
+		</div>
+		{% endif %}
 
-		/* Eye button */
-		.password-toggle {
-			position: absolute;
-			right: 12px;
-			top: 50%;
-			transform: translateY(-50%);
-			cursor: pointer;
-			opacity: 0.85;
-			font-size: 18px;
-			color: #dffaff;
-		}
+		{% if app.user %}
+		<div class="alert alert-info session-box">
+			Vous êtes connecté en tant que
+			<strong>{{ app.user.userIdentifier }}</strong>,
+			<a href="{{ path('app_logout') }}">Déconnexion</a>
+		</div>
+		{% endif %}
 
-		/* Button turquoise */
-		.btn-glass {
-			width: 100%;
-			padding: 0.7rem;
-			margin-top: 0.5rem;
-			background: linear-gradient(135deg, #4CD4CB, #6ED6FF);
-			border: none;
-			border-radius: 10px;
-			color: #00324f;
-			font-weight: 700;
-			letter-spacing: 0.4px;
-			transition: 0.15s;
-		}
-
-		.btn-glass:hover {
-			transform: translateY(-2px);
-			box-shadow: 0 6px 14px rgba(0, 140, 200, 0.35);
-		}
-
-		/* Footer */
-		.login-footer {
-			margin-top: 16px;
-			text-align: center;
-			color: #e6faff;
-			font-size: 0.85rem;
-			opacity: 0.85;
-		}
-
-		@keyframes fadeIn {
-			from {
-				opacity: 0;
-				transform: translateY(12px);
-			}
-			to {
-				opacity: 1;
-				transform: translateY(0);
-			}
-		}
-	</style>
-
-
-	<div class="glass-wrapper">
-		<div class="glass-card">
-
-			<img src="{{ asset('images/logo-ligair.png') }}" alt="LIGAIR" class="glass-logo">
-
-			<div class="glass-title-main">Portail d'administration LIGAIR</div>
-
-			{% if error %}
-				<div class="alert alert-danger">
-					{{ error.messageKey|trans(error.messageData, 'security') }}
+		<form method="post" class="form-stack">
+			<div class="field">
+				<label for="username" class="field-label">Adresse email</label>
+				<div class="input-wrap">
+					<span class="input-icon">✉️</span>
+					<input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control"
+						placeholder="nom@ligair.fr" required autofocus autocomplete="email">
 				</div>
-			{% endif %}
+			</div>
 
-			{% if app.user %}
-				<div class="alert alert-info small">
-					Vous êtes connecté en tant que
-					<strong>{{ app.user.userIdentifier }}</strong>,
-					<a href="{{ path('app_logout') }}">Déconnexion</a>
-				</div>
-			{% endif %}
-
-			<form
-				method="post">
-
-				<!-- Email -->
-				<div class="input-group">
-					<span class="input-icon">📧</span>
-					<input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" placeholder="Adresse email" required autofocus>
-				</div>
-
-				<!-- Password -->
-				<div class="input-group">
+			<div class="field">
+				<label for="password" class="field-label">Mot de passe</label>
+				<div class="input-wrap">
 					<span class="input-icon">🔒</span>
-					<input type="password" name="_password" id="password" class="form-control" placeholder="Mot de passe" required>
-					<span class="password-toggle" id="togglePassword">👁️</span>
+					<input type="password" name="_password" id="password" class="form-control"
+						placeholder="Votre mot de passe" required autocomplete="current-password">
+					<span class="password-toggle" id="togglePassword" aria-label="Afficher le mot de passe">👁️</span>
 				</div>
+			</div>
 
-				<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+			<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-				<button class="btn-glass" type="submit">Se connecter</button>
-			</form>
-		</div>
-
-		<div class="login-footer">
-			©
-			{{ "now"|date("Y") }}
-			— LIGAIR • Portail Administratif
-		</div>
+			<div class="actions">
+				<button class="btn-submit" type="submit">Se connecter</button>
+			</div>
+		</form>
 	</div>
 
+	<div class="auth-footer">
+		© {{ "now"|date("Y") }} — LigAir • Portail Intranet
+	</div>
+</div>
 
-	<script>
-		document.getElementById('togglePassword').addEventListener('click', function () {
-const pwd = document.getElementById('password');
-if (pwd.type === "password") {
-pwd.type = "text";
-this.textContent = "🙈";
-} else {
-pwd.type = "password";
-this.textContent = "👁️";
-}
-});
-	</script>
+<script>
+	const togglePassword = document.getElementById('togglePassword');
+	const passwordInput = document.getElementById('password');
 
+	if (togglePassword && passwordInput) {
+		togglePassword.addEventListener('click', function () {
+			const isPassword = passwordInput.type === 'password';
+			passwordInput.type = isPassword ? 'text' : 'password';
+			this.textContent = isPassword ? '🙈' : '👁️';
+		});
+	}
+</script>
 {% endblock %}

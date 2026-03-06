@@ -242,12 +242,6 @@
 							</div>
 						</div>
 
-						{# optionnel: recherche #}
-						<div class="mb-2">
-							<input type="text" class="form-control form-control-sm" id="presentSearch"
-								placeholder="Rechercher un nom…">
-						</div>
-
 						<div class="row g-2" id="presentsGrid">
 							{% for u in users %}
 							{% set isChef = u.id in responsablesIds %}
