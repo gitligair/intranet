@@ -3,6 +3,8 @@
 /.env.local
 /.env.local.php
 /.env.*.local
+/.env
+/.env.*
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
@@ -27,6 +29,7 @@
 ###> symfony/webpack-encore-bundle ###
 /node_modules/
 /public/build/
+/public/uploads/scripts/*
 npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
