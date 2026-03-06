@@ -29,14 +29,14 @@ services:
   # please note that last definitions always *replace* previous ones
   App\Services\ApimeteocentreService:
     arguments:
-      $apiKey_cnrs: "%env(WEATHERLINK_API_KEY_CNRS)%"
-      $apiSecret_cnrs: "%env(WEATHERLINK_API_SECRET_CNRS)%"
+      # $apiKey_cnrs: "%env(WEATHERLINK_API_KEY_CNRS)%"
+      # $apiSecret_cnrs: "%env(WEATHERLINK_API_SECRET_CNRS)%"
 
-      $apiKey_droue: "%env(WEATHERLINK_API_KEY_DROUE)%"
-      $apiSecret_droue: "%env(WEATHERLINK_API_SECRET_DROUE)%"
+      # $apiKey_droue: "%env(WEATHERLINK_API_KEY_DROUE)%"
+      # $apiSecret_droue: "%env(WEATHERLINK_API_SECRET_DROUE)%"
 
-      $apiKey_bazoches: "%env(WEATHERLINK_API_KEY_BAZOCHES)%"
-      $apiSecret_bazoches: "%env(WEATHERLINK_API_SECRET_BAZOCHES)%"
+      # $apiKey_bazoches: "%env(WEATHERLINK_API_KEY_BAZOCHES)%"
+      # $apiSecret_bazoches: "%env(WEATHERLINK_API_SECRET_BAZOCHES)%"
 
       $apiKey_ligair: "%env(LIGAIR_API_KEY)%"
       $apiSecret_ligair: "%env(LIGAIR_API_SECRET)%"

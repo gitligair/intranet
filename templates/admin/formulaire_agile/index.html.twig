@@ -6,8 +6,7 @@
 {% block main %}
 
 {% block page_actions %}
-<a class="btn btn-info"
-	href="{{ ea_url().setController('App\\\\Controller\\\\Admin\\\\FormulaireCrudController').setAction('index') }}">
+<a class="btn btn-info" href="/admin/formulaire">
 	Liste des formulaires créés
 </a>
 {% endblock %}
@@ -80,11 +79,16 @@
 
 	.pole-name {
 		font-weight: 600;
-		font-size: 1rem;
+		font-family: 'Poppins', sans-serif;
+		font-size: 0.9rem;
+		width: 200px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.pole-meta {
-		font-size: 0.75rem;
+		font-size: 0.5rem;
 		color: #6b7280;
 	}
 
@@ -103,7 +107,7 @@
 
 	/* ===== TACHES PRIORITAIRES ===== */
 	.tache-card {
-		background: #fff;
+		background: #f0f9fd;
 		border-radius: 12px;
 		border: 1px solid #e5e7eb;
 		padding: 10px;
@@ -188,17 +192,23 @@
 					<div class="col-md-4 my-2">
 						<div class="form-control">
 							<label for="date_jour">Date de reunion</label>
-							<input type="date" id="date_jour" name="date_jour" placeholder="now()" class="form-control form-control-sm">
+							<input type="date" id="date_jour" name="date_jour" value="{{ " now"|date('Y-m-d') }}"
+								class="form-control form-control-sm">
 						</div>
 					</div>
 					<div class="col-md-4 my-2">
 						<div class="form-control">
 							<label for="choix_animateur">Animateur</label>
 							<select id="choix_animateur" class="form-control form-control-sm" name="animateurId">
-								<option value="">-- Choisir --</option>
+
+
 								{% for u in users %}
-								<option value="{{ u.id }}">{{ u.nom }} {{ u.prenom }}</option>
+								<option value="{{ u.id }}" {% if app.user and u.id==app.user.id %}selected{% endif %}>
+									{{ u.nom }} {{ u.prenom }}
+									{% if app.user and u.id == app.user.id %}(Vous){% endif %}
+								</option>
 								{% endfor %}
+
 							</select>
 						</div>
 					</div>
@@ -206,7 +216,7 @@
 						<div class="form-control">
 							<label for="reunionTenue">Reunion tenue ?</label>
 							<label class="d-flex align-items-center gap-2" style="cursor:pointer;">
-								<input type="checkbox" name="reunionTenue" value="1">
+								<input type="checkbox" checked name="reunionTenue" value="1">
 								<span>OUI</span>
 							</label>
 						</div>
@@ -214,23 +224,69 @@
 
 					<!-- Liste des presents à la reunion -->
 					<div class="col-md-12 my-2">
-						<div class="word-label mb-2" style="font-weight:600;">Présents à la réunion</div>
-		
-						<div class="row g-2">
+						<div class="d-flex justify-content-between align-items-center mb-2">
+							<div class="word-label" style="font-weight:600;">Présents à la réunion</div>
+
+							<div class="d-flex gap-2">
+								<button type="button" class="btn btn-sm btn-outline-secondary" id="btnCheckAll">
+									Tout cocher
+								</button>
+
+								<button type="button" class="btn btn-sm btn-outline-secondary" id="btnCheckChefs">
+									Chefs de pôle seulement
+								</button>
+
+								<button type="button" class="btn btn-sm btn-outline-secondary" id="btnUncheckAll">
+									Tout décocher
+								</button>
+							</div>
+						</div>
+
+						{# optionnel: recherche #}
+						<div class="mb-2">
+							<input type="text" class="form-control form-control-sm" id="presentSearch"
+								placeholder="Rechercher un nom…">
+						</div>
+
+						<div class="row g-2" id="presentsGrid">
 							{% for u in users %}
-							<div class="col-md-3 col-sm-6">
-								<label class="d-flex align-items-center gap-2" style="cursor:pointer;">
-									<input type="checkbox" name="presents[]" value="{{ u.id }}">
-									<span>{{ u.nom }} {{ u.prenom }}</span>
+							{% set isChef = u.id in responsablesIds %}
+							{% set isMe = app.user and u.id == app.user.id %}
+
+							{# Initiales ADP #}
+							{% set prenomInitiale = u.prenom|trim|slice(0,1)|upper %}
+							{% set nomInitiales = '' %}
+							{% for part in u.nom|trim|split(' ') %}
+							{% if part|trim != '' %}
+							{% set nomInitiales = nomInitiales ~ part|trim|slice(0,1)|upper %}
+							{% endif %}
+							{% endfor %}
+							{% set initials = prenomInitiale ~ nomInitiales %}
+
+							<div class="col-1 present-item" data-name="{{ (u.nom ~ ' ' ~ u.prenom)|lower }}">
+								<label class="d-flex align-items-center gap-2 p-2"
+									style="cursor:pointer; border:1px solid #eee; border-radius:10px; background:#fff;">
+									<input type="checkbox" class="present-checkbox" name="presents[]" value="{{ u.id }}"
+										data-chef="{{ u.id in responsablesIds ? 1 : 0 }}" {% if isChef or isMe
+										%}checked{% endif %}>
+
+									<span style="font-weight:600;">{{ initials }}</span>
+
+
+
+									<span class="ms-auto d-flex gap-1">
+										{% if isMe %}
+										<span class="badge bg-info">Vous</span>
+										{% endif %}
+									</span>
 								</label>
 							</div>
 							{% endfor %}
 						</div>
-		
 					</div>
 
 				</div>
-				
+
 			</div>
 		</div>
 
@@ -239,67 +295,7 @@
 			<div class="word-card-title">Points clés par pôle</div>
 			<div class="word-card-body">
 				<div class="row g-3">
-					{% set colors = ['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#14b8a6'] %}
-
-					{% for pole in poles %}
-					{% set color = colors[loop.index0 % colors|length] %}
-
-					<div class="col-xl-3 col-lg-4 col-md-6">
-						<div class="pole-card collapsed" style="border-left:6px solid {{ color }};"
-							data-pole-id="{{ pole.id }}">
-							<div class="pole-header">
-								<div>
-									<div class="pole-name">{{ pole.nom }}</div>
-									<div class="pole-meta">
-										Resp.: {{ pole.responsable ? pole.responsable.nom ~ ' ' ~
-										pole.responsable.prenom : '—' }}
-										· {{ pole.personnel|length }} pers.
-										· <span class="points-count">1</span> points clés
-									</div>
-								</div>
-								<div class="toggle-indicator">▸</div>
-							</div>
-
-							<div class="pole-body p-2">
-
-								<div class="points-cles-card">
-									<div class="d-flex justify-content-between align-items-center mb-2">
-										<div class="section-title">Points clés</div>
-										<button type="button" class="btn-word btnAddPointCle"
-											style="background-color: {{ color }};border:none;color:white;"
-											data-pole-id="{{ pole.id }}">+ Point clé</button>
-									</div>
-
-									<div class="pointsClesBody" data-pole-id="{{ pole.id }}">
-										<div class="point-cle-row" data-index="0">
-											<div class="input-group mb-2">
-												<input type="text" class="form-control"
-													name="pointsClesParPole[{{ pole.id }}][0][texte]"
-													placeholder="Point clé…">
-												<button type="button"
-													class="btn btn-outline-danger btnRemovePointCle">✕</button>
-											</div>
-										</div>
-									</div>
-
-									<template id="tpl-point-cle-{{ pole.id }}">
-										<div class="point-cle-row" data-index="__i__">
-											<div class="input-group mb-2">
-												<input type="text" class="form-control"
-													name="pointsClesParPole[{{ pole.id }}][__i__][texte]"
-													placeholder="Point clé…">
-												<button type="button"
-													class="btn btn-outline-danger btnRemovePointCle">✕</button>
-											</div>
-										</div>
-									</template>
-
-								</div>
-
-							</div>
-						</div>
-					</div>
-					{% endfor %}
+					{{ include('admin/formulaire_agile/_partials/points_cles.html.twig') }}
 				</div>
 			</div>
 		</div>
@@ -313,106 +309,30 @@
 					<button type="button" class="btn-word btnAddTask"
 						style="background-color:#22223ede;border:none;color:#dff163;">+ Ajouter une tâche</button>
 				</div>
+				<!-- Taches prioritaires -->
+				{{ include('admin/formulaire_agile/_partials/taches_prioritaire.html.twig') }}
 
-				<div class="tasks-container mb-2" data-scope="prioritaire" data-group-id="1">
-					<div class="tache-row" data-index="0" data-scope="prioritaire" data-group-id="1">
-						<div class="tache-card">
-							<div class="tache-header">
-								<span class="tache-title">Tâche <span class="tache-num">1</span></span>
-								<button type="button" class="btn-icon btnRemoveTask" title="Supprimer">✕</button>
-							</div>
+			</div>
+		</div>
 
-							<div class="row g-2">
-								<div class="col-12">
-									<label class="form-label small">Description</label>
-									<input class="word-input" type="text" name="tachesprioritaire[0][description]">
-								</div>
-
-								<div class="col-md-4">
-									<label class="form-label small">Pilote</label>
-									<select class="word-select" name="tachesprioritaire[0][pilote]">
-										<option value="">-- Choisir --</option>
-										{% for u in users %}
-										<option value="{{ u.id }}">{{ u.nom }} {{ u.prenom }}</option>
-										{% endfor %}
-									</select>
-								</div>
-
-								<div class="col-md-4">
-									<label class="form-label small">Doublon</label>
-									<select class="word-select" name="tachesprioritaire[0][doublon]">
-										<option value="">-- Choisir --</option>
-										{% for u in users %}
-										<option value="{{ u.id }}">{{ u.nom }} {{ u.prenom }}</option>
-										{% endfor %}
-									</select>
-								</div>
-
-								<div class="col-md-3">
-									<label class="form-label small">Délai</label>
-									<input class="word-input" type="datetime-local" name="tachesprioritaire[0][delai]">
-								</div>
-
-								<div class="col-md-1 text-center">
-									<label class="form-label small">Fait</label>
-									<input type="checkbox" name="tachesprioritaire[0][fait]" value="1">
-								</div>
-							</div>
-
-						</div>
-					</div>
+		{# --- Partage d’information dans les équipes --- #}
+		<div class="word-card">
+			<div class="word-card-title">Partage d’information dans les équipes</div>
+			<div class="word-card-body">
+				<div class="row g-3">
+					{{ include('admin/formulaire_agile/_partials/partages_information.html.twig') }}
 				</div>
+			</div>
+		</div>
 
-				<template id="tpl-task-prioritaire-1">
-					<div class="tache-row" data-index="__i__" data-scope="prioritaire" data-group-id="1">
-						<div class="tache-card">
-							<div class="tache-header">
-								<span class="tache-title">Tâche <span class="tache-num">__n__</span></span>
-								<button type="button" class="btn-icon btnRemoveTask" title="Supprimer">✕</button>
-							</div>
+		{# --- Suivi & prochaine réunion --- #}
+		<div class="word-card">
+			<div class="word-card-title">Suivi & prochaine réunion</div>
 
-							<div class="row g-2">
-								<div class="col-12">
-									<label class="form-label small">Description</label>
-									<input class="word-input" type="text" name="tachesprioritaire[__i__][description]">
-								</div>
-
-								<div class="col-md-4">
-									<label class="form-label small">Pilote</label>
-									<select class="word-select" name="tachesprioritaire[__i__][pilote]">
-										<option value="">-- Choisir --</option>
-										{% for u in users %}
-										<option value="{{ u.id }}">{{ u.nom }} {{ u.prenom }}</option>
-										{% endfor %}
-									</select>
-								</div>
-
-								<div class="col-md-4">
-									<label class="form-label small">Doublon</label>
-									<select class="word-select" name="tachesprioritaire[__i__][doublon]">
-										<option value="">-- Choisir --</option>
-										{% for u in users %}
-										<option value="{{ u.id }}">{{ u.nom }} {{ u.prenom }}</option>
-										{% endfor %}
-									</select>
-								</div>
-
-								<div class="col-md-3">
-									<label class="form-label small">Délai</label>
-									<input class="word-input" type="datetime-local"
-										name="tachesprioritaire[__i__][delai]">
-								</div>
-
-								<div class="col-md-1 text-center">
-									<label class="form-label small">Fait</label>
-									<input type="checkbox" name="tachesprioritaire[__i__][fait]" value="1">
-								</div>
-							</div>
-
-						</div>
-					</div>
-				</template>
-
+			<div class="word-card-body">
+				<div class="row g-3">
+					{{ include('admin/formulaire_agile/_partials/prochaine_reunion.html.twig') }}
+				</div>
 			</div>
 		</div>
 
@@ -562,6 +482,36 @@
 				if (!ok) e.preventDefault();
 			});
 		}
+	})();
+</script>
+<script>
+	(function () {
+
+		const grid = document.getElementById('presentsGrid');
+		const btnAll = document.getElementById('btnCheckAll');
+		const btnNone = document.getElementById('btnUncheckAll');
+		const btnChefs = document.getElementById('btnCheckChefs');
+
+		if (!grid) return;
+
+		const checkboxes = grid.querySelectorAll('.present-checkbox');
+
+		function checkAll(value) {
+			checkboxes.forEach(cb => cb.checked = value);
+		}
+
+		function checkOnlyChefs() {
+			checkboxes.forEach(cb => {
+				cb.checked = cb.dataset.chef === "1";
+			});
+		}
+
+		if (btnAll) btnAll.addEventListener('click', () => checkAll(true));
+
+		if (btnNone) btnNone.addEventListener('click', () => checkAll(false));
+
+		if (btnChefs) btnChefs.addEventListener('click', checkOnlyChefs);
+
 	})();
 </script>
 {% endblock %}

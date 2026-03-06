@@ -132,6 +132,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: BaseScript::class, mappedBy: 'addedBy')]
     private Collection $baseScripts;
 
+    /**
+     * @var Collection<int, FormTachesprioritaires>
+     */
+    #[ORM\OneToMany(mappedBy: 'pilote', targetEntity: FormTachesprioritaires::class)]
+    private Collection $tachesPilotees;
+
+    /**
+     * @var Collection<int, FormTachesprioritaires>
+     */
+    #[ORM\OneToMany(mappedBy: 'doublon', targetEntity: FormTachesprioritaires::class)]
+    private Collection $tachesDoublon;
+
+    /**
+     * @var Collection<int, Formulaire>
+     */
+    #[ORM\OneToMany(targetEntity: Formulaire::class, mappedBy: 'animateur')]
+    private Collection $formulaires;
+
+    #[ORM\ManyToMany(targetEntity: Formulaire::class, mappedBy: 'presents')]
+    private Collection $formulairesPresents;
+
 
     public function __construct()
     {
@@ -146,6 +167,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->notifications = new ArrayCollection();
         $this->accessoires = new ArrayCollection();
         $this->baseScripts = new ArrayCollection();
+        $this->tachesPilotees = new ArrayCollection();
+        $this->tachesDoublon = new ArrayCollection();
+        $this->formulaires = new ArrayCollection();
+        $this->formulairesPresents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -620,5 +645,100 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, FormTachesprioritaires>
+     */
+    public function getTachesPilotees(): Collection
+    {
+        return $this->tachesPilotees;
+    }
+
+    public function addFormTachesprioritairePilotees(FormTachesprioritaires $tachesPilotees): static
+    {
+        if (!$this->tachesPilotees->contains($tachesPilotees)) {
+            $this->tachesPilotees->add($tachesPilotees);
+            $tachesPilotees->setPilote($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFormTachesprioritairePilotee(FormTachesprioritaires $tachesPilotees): static
+    {
+        if ($this->tachesPilotees->removeElement($tachesPilotees)) {
+            // set the owning side to null (unless already changed)
+            if ($tachesPilotees->getPilote() === $this) {
+                $tachesPilotees->setPilote(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FormTachesprioritaires>
+     */
+    public function getTachesDoublon(): Collection
+    {
+        return $this->tachesDoublon;
+    }
+
+    public function addFormTachesprioritaireDoublon(FormTachesprioritaires $tachesDoublon): static
+    {
+        if (!$this->tachesDoublon->contains($tachesDoublon)) {
+            $this->tachesDoublon->add($tachesDoublon);
+            $tachesDoublon->setDoublon($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFormTachesprioritaireDoublon(FormTachesprioritaires $tachesDoublon): static
+    {
+        if ($this->tachesDoublon->removeElement($tachesDoublon)) {
+            // set the owning side to null (unless already changed)
+            if ($tachesDoublon->getDoublon() === $this) {
+                $tachesDoublon->setDoublon(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Formulaire>
+     */
+    public function getFormulaires(): Collection
+    {
+        return $this->formulaires;
+    }
+
+    public function addFormulaire(Formulaire $formulaire): static
+    {
+        if (!$this->formulaires->contains($formulaire)) {
+            $this->formulaires->add($formulaire);
+            $formulaire->setAnimateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFormulaire(Formulaire $formulaire): static
+    {
+        if ($this->formulaires->removeElement($formulaire)) {
+            // set the owning side to null (unless already changed)
+            if ($formulaire->getAnimateur() === $this) {
+                $formulaire->setAnimateur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getFormulairesPresents(): Collection
+    {
+        return $this->formulairesPresents;
     }
 }

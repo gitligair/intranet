@@ -1,0 +1,25 @@
+<div class="col-md-6">
+    <label class="form-label" style="font-weight:600;">Prochaine réunion (date/heure)</label>
+    <input class="form-control form-control-sm" type="datetime-local" name="prochaineReunionAt">
+</div>
+
+<div class="col-md-6">
+    <label class="form-label" style="font-weight:600;">Animateur prochaine réunion</label>
+    <select class="form-control form-control-sm" name="prochainAnimateurId">
+        <option value="">-- Choisir --</option>
+
+        {% for u in users %}
+        <option value="{{ u.id }}" {% if app.user and u.id==app.user.id %}selected{% endif %}>
+            {# Initiales type ADP #}
+            {% set prenomInitiale = u.prenom|trim|slice(0,1)|upper %}
+            {% set nomInitiales = '' %}
+            {% for part in u.nom|trim|split(' ') %}
+            {% if part|trim != '' %}
+            {% set nomInitiales = nomInitiales ~ part|trim|slice(0,1)|upper %}
+            {% endif %}
+            {% endfor %}{{ u.nom }} {{ u.prenom }}
+            {% if app.user and u.id == app.user.id %}(Vous){% endif %}
+        </option>
+        {% endfor %}
+    </select>
+</div>

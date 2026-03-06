@@ -1,0 +1,113 @@
+<div class="tasks-container mb-2" data-scope="prioritaire" data-group-id="1">
+    <div class="tache-row" data-index="0" data-scope="prioritaire" data-group-id="1">
+        <div class="tache-card">
+            <div class="tache-header">
+                <span class="tache-title">Tâche <span class="tache-num">1</span></span>
+                <button type="button" class="btn-icon btnRemoveTask" title="Supprimer">✕</button>
+            </div>
+
+            <div class="row g-2">
+                <div class="col-md-3 my-2">
+                    <label for="choix_pole" class="form-label ">Pole</label>
+                    <select id="choix_pole" class="word-select" name="tachesprioritaire[0][poleId]">
+                        <option value="">-- Choisir --</option>
+                        {% for pole in poles %}
+                        <option value="{{ pole.id }}">{{ pole.nom }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row g-2">
+                <div class="col-md-6 my-2">
+                    <label class="form-label ">Description</label>
+                    <textarea cols="4" class="word-input" type="text" name="tachesprioritaire[0][description]"></textarea>
+                </div>
+            </div>
+            <div class="row g-2">
+                <div class="col-md-4 my-2">
+                    <label class="form-label ">Pilote</label>
+                    <select class="word-select" name="tachesprioritaire[0][pilote]">
+                        <option value="">-- Choisir --</option>
+                        {% for u in users %}
+                        <option value="{{ u.id }}">{{ u.nom }} {{ u.prenom }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-4 my-2">
+                    <label class="form-label ">Doublon</label>
+                    <select class="word-select" name="tachesprioritaire[0][doublon]">
+                        <option value="">-- Choisir --</option>
+                        {% for u in users %}
+                        <option value="{{ u.id }}">{{ u.nom }} {{ u.prenom }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row g-2">
+                <div class="col-md-3 my-2">
+                    <label class="form-label ">Délai</label>
+                    <input class="word-input" type="date" name="tachesprioritaire[0][delai]">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Template pour ajouter les tâches prioritaires -->
+<template id="tpl-task-prioritaire-1">
+    <div class="tache-row" data-index="__i__" data-scope="prioritaire" data-group-id="1">
+        <div class="tache-card">
+            <div class="tache-header">
+                <span class="tache-title">Tâche <span class="tache-num">__n__</span></span>
+                <button type="button" class="btn-icon btnRemoveTask" title="Supprimer">✕</button>
+            </div>
+
+            <div class="row g-2">
+                <div class="col-md-3 my-2">
+                    <label for="choix_pole" class="form-label ">Pole</label>
+                    <select id="choix_pole" class="word-select" name="tachesprioritaire[__i__][poleId]">
+                        <option value="">-- Choisir --</option>
+                        {% for pole in poles %}
+                        <option value="{{ pole.id }}">{{ pole.nom }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row g-2">
+                <div class="col-md-6 my-2">
+                    <label class="form-label ">Description</label>
+                    <textarea cols="4" class="word-input" type="text" name="tachesprioritaire[__i__][description]"></textarea>
+                </div>
+            </div>
+            <div class="row g-2">
+                <div class="col-md-4 my-2">
+                    <label class="form-label">Pilote</label>
+                    <select class="word-select" name="tachesprioritaire[__i__][pilote]">
+                        <option value="">-- Choisir --</option>
+                        {% for u in users %}
+                        <option value="{{ u.id }}">{{ u.nom }} {{ u.prenom }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-4 my-2">
+                    <label class="form-label ">Doublon</label>
+                    <select class="word-select" name="tachesprioritaire[__i__][doublon]">
+                        <option value="">-- Choisir --</option>
+                        {% for u in users %}
+                        <option value="{{ u.id }}">{{ u.nom }} {{ u.prenom }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row g-2">
+                <div class="col-md-3 my-2">
+                    <label class="form-label">Délai</label>
+                    <input class="word-input" type="date" name="tachesprioritaire[__i__][delai]">
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,253 @@
+<style>
+	.info-line {
+		display: flex;
+		gap: 8px;
+		align-items: center;
+		margin-bottom: 8px;
+	}
+
+	.info-line input {
+		flex: 1;
+	}
+
+	.pole-card {
+		border: 1px solid #ededed;
+		border-radius: 12px;
+		background: white;
+		box-shadow: 0 1px 6px rgba(0, 0, 0, 0.03);
+	}
+
+	.pole-card-body {
+		padding: 12px;
+	}
+</style>
+
+<div class="row g-3">
+
+	{% set colors = ['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#14b8a6'] %}
+
+	{% for pole in poles %}
+		{% set color = colors[loop.index0 % colors|length] %}
+
+		<div class="col-lg-3 col-md-4 col-sm-6">
+			<div class="pole-card collapsed" style="border-left:6px solid {{ color }};" data-pole-id="{{ pole.id }}" data-section="share">
+				<div class="pole-header">
+					<div>
+						<div class="pole-name">{{ pole.nom }}</div>
+						<div class="pole-meta">
+							Resp.:
+							{{ pole.responsable ? pole.responsable.nom ~ ' ' ~ pole.responsable.prenom : '—' }}
+							·
+							{{ pole.personnel|length }}
+							pers. ·
+							<span class="share-count">1</span>
+							infos partagées
+						</div>
+					</div>
+					<div class="toggle-indicator">▸</div>
+				</div>
+
+				<div class="pole-body p-2">
+
+					<div class="points-cles-card">
+						<div class="d-flex justify-content-between align-items-center mb-2">
+							<div class="section-title">Partage d’information</div>
+
+							<button type="button" class="btn-word btnAddShareInfo" style="background-color: {{ color }}; border:none; color:white;" data-pole-id="{{ pole.id }}">
+								+ Info
+							</button>
+						</div>
+
+						<div class="shareInfoBody" data-pole-id="{{ pole.id }}">
+							<div class="share-row" data-index="0">
+								<div class="input-group mb-2">
+									<input type="text" class="form-control" name="partageInfoParPole[{{ pole.id }}][0][texte]" placeholder="Visio, réunion, retour, RDV, action…">
+									<button type="button" class="btn btn-outline-danger btnRemoveShareInfo">✕</button>
+								</div>
+
+								<div class="d-flex gap-3 align-items-center mb-2" style="margin-top:-6px;">
+									<label class="d-flex align-items-center gap-2" style="cursor:pointer;font-size:.8rem;color:#6b7280;">
+										<input type="checkbox" name="partageInfoParPole[{{ pole.id }}][0][important]" value="1">
+										<span>Important</span>
+									</label>
+									<label class="d-flex align-items-center gap-2" style="cursor:pointer;font-size:.8rem;color:#6b7280;">
+										<input type="checkbox" name="partageInfoParPole[{{ pole.id }}][0][aRelancer]" value="1">
+										<span>À relancer</span>
+									</label>
+								</div>
+							</div>
+						</div>
+
+						<template id="tpl-share-info-{{ pole.id }}">
+							<div class="share-row" data-index="__i__">
+								<div class="input-group mb-2">
+									<input type="text" class="form-control" name="partageInfoParPole[{{ pole.id }}][__i__][texte]" placeholder="Visio, réunion, retour, RDV, action…">
+									<button type="button" class="btn btn-outline-danger btnRemoveShareInfo">✕</button>
+								</div>
+
+								<div class="d-flex gap-3 align-items-center mb-2" style="margin-top:-6px;">
+									<label class="d-flex align-items-center gap-2" style="cursor:pointer;font-size:.8rem;color:#6b7280;">
+										<input type="checkbox" name="partageInfoParPole[{{ pole.id }}][__i__][important]" value="1">
+										<span>Important</span>
+									</label>
+									<label class="d-flex align-items-center gap-2" style="cursor:pointer;font-size:.8rem;color:#6b7280;">
+										<input type="checkbox" name="partageInfoParPole[{{ pole.id }}][__i__][aRelancer]" value="1">
+										<span>À relancer</span>
+									</label>
+								</div>
+							</div>
+						</template>
+
+					</div>
+
+				</div>
+			</div>
+		</div>
+	{% endfor %}
+
+</div>
+
+
+<script>
+
+	(function () {
+
+function renumberInfosPole(poleId) {
+
+const container = document.querySelector('.infosPole[data-pole-id="' + poleId + '"]');
+
+if (! container) 
+return;
+
+
+
+const items = container.querySelectorAll('.infoItem');
+
+items.forEach((item, idx) => {
+
+item.dataset.index = idx;
+
+item.querySelectorAll('[name]').forEach(el => {
+
+el.name = el.name.replace(new RegExp('partageInfoParPole\\[' + poleId + '\\]\\[\\d+\\]'), 'partageInfoParPole[' + poleId + '][' + idx + ']');
+
+});
+
+});
+
+}
+
+function addInfoPole(poleId) {
+
+const container = document.querySelector('.infosPole[data-pole-id="' + poleId + '"]');
+
+const tpl = document.getElementById('tpl-info-pole-' + poleId);
+
+if (! container || ! tpl) 
+return;
+
+
+
+const i = container.querySelectorAll('.infoItem').length;
+
+const html = tpl.innerHTML.replaceAll('__i__', i);
+
+const temp = document.createElement('div');
+
+temp.innerHTML = html.trim();
+
+container.appendChild(temp.firstElementChild);
+
+}
+
+// ===== Counters partage info =====
+function updatePoleShareCounter(poleId) {
+const pole = document.querySelector('.pole-card[data-pole-id="' + poleId + '"][data-section="share"]') || document.querySelector('.pole-card[data-pole-id="' + poleId + '"]'); // fallback
+if (! pole) 
+return;
+
+
+
+const rows = pole.querySelectorAll('.share-row').length;
+const el = pole.querySelector('.share-count');
+if (el) 
+el.textContent = rows;
+
+
+
+}
+
+// ===== Partage info add/remove =====
+function addShareInfo(poleId) {
+const container = document.querySelector('.shareInfoBody[data-pole-id="' + poleId + '"]');
+const template = document.getElementById('tpl-share-info-' + poleId);
+if (! container || ! template) 
+return;
+
+
+
+const index = container.querySelectorAll('.share-row').length;
+container.insertAdjacentHTML('beforeend', template.innerHTML.replace(/__i__/g, index));
+updatePoleShareCounter(poleId);
+}
+
+function removeShareInfo(btnEl) {
+const container = btnEl.closest('.shareInfoBody');
+if (! container) 
+return;
+
+
+
+const poleId = container.dataset.poleId;
+if (container.querySelectorAll('.share-row').length <= 1) 
+return;
+
+
+
+btnEl.closest('.share-row').remove();
+updatePoleShareCounter(poleId);
+}
+
+document.addEventListener('click', function (e) {
+
+const addBtn = e.target.closest('.btnAddInfoPole');
+
+if (addBtn) {
+
+addInfoPole(addBtn.getAttribute('data-pole-id'));
+
+return;
+
+}
+
+const removeBtn = e.target.closest('.btnRemoveInfoPole');
+
+if (removeBtn) {
+
+const item = removeBtn.closest('.infoItem');
+
+const poleId = item.getAttribute('data-pole-id');
+
+item.remove();
+
+renumberInfosPole(poleId);
+
+}
+
+// Partage info
+const btnAddShare = e.target.closest('.btnAddShareInfo');
+if (btnAddShare) {
+addShareInfo(btnAddShare.dataset.poleId);
+return;
+}
+
+const btnRemoveShare = e.target.closest('.btnRemoveShareInfo');
+if (btnRemoveShare) {
+removeShareInfo(btnRemoveShare);
+return;
+}
+
+});
+
+})();
+</script>

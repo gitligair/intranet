@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Services\WeatherLinkService;
+
 use App\Services\ApimeteocentreService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -19,25 +19,26 @@ final class ServicesController extends AbstractController
         ]);
     }
 
-    // #Retourne sous forme de json les données d'une station donnée
-    // #[Route('/donnees/{station}', name: 'donnees_station')]
-    // public function station(ApimeteocentreService $client, string $stationKey, string $stationId): JsonResponse
-    // {
-    //     try {
-    //         $data = $client->getStationData($stationKey, $stationId);
-    //         return $this->json($data);
-    //     } catch (\Throwable $e) {
-    //         return $this->json(['error' => $e->getMessage()], 500);
-    //     }
-    // }
 
-    // Retourne les details d'une station donnée
+    // Retourne les details des stations qu'on m'a partagé
     #[Route('/station', name: 'weather_stations')]
     public function stations(ApimeteocentreService $client): JsonResponse
     {
-        $data = $client->getStations();
+        $data = $client->listStations();
 
         try {
+            return $this->json($data);
+        } catch (\Throwable $e) {
+            return $this->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    // Retourne les données d'une station donnée
+    #[Route('/station/{id}', name: 'weather_station_data')]
+    public function stationData(ApimeteocentreService $client, string $id): JsonResponse
+    {
+        try {
+            $data = $client->getStationData($id);
             return $this->json($data);
         } catch (\Throwable $e) {
             return $this->json(['error' => $e->getMessage()], 500);

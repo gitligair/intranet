@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Entity\User;
+
 use App\Repository\PolesRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -10,8 +10,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class FormulaireAgileService
 {
-    private $em;
-    private $userPasswordHasher;
+
     private $users;
 
     public function __construct(
@@ -20,8 +19,7 @@ class FormulaireAgileService
         UserRepository $users,
         private PolesRepository $polesRepository
     ) {
-        $this->em = $entityManager;
-        $this->userPasswordHasher = $userPasswordHasher;
+
         $this->users = $users;
         $this->polesRepository = $polesRepository;
     }
@@ -32,9 +30,21 @@ class FormulaireAgileService
         return $this->users->findAll();
     }
 
+    // Fonction qui retourne un user par son id
+    public function getUserById($id)
+    {
+        return $this->users->find($id);
+    }
+
     // Recuperer les poles
     public function getPoles()
     {
         return $this->polesRepository->findAll();
+    }
+
+    // Fonction qui retourne un pole par son id
+    public function getPoleById($id)
+    {
+        return $this->polesRepository->find($id);
     }
 }

@@ -2,31 +2,32 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Os;
-use App\Entity\User;
-use App\Entity\Ecran;
-use App\Entity\Poles;
-use App\Entity\Bureau;
-use App\Entity\Materiel;
-use App\Entity\Services;
-use App\Entity\Categorie;
-use App\Entity\Processus;
 use App\Entity\Accessoire;
 use App\Entity\BaseDeDonnees;
 use App\Entity\BaseScript;
-use App\Entity\Ordinateur;
-use App\Entity\TaillePouce;
+use App\Entity\Bureau;
+use App\Entity\Categorie;
 use App\Entity\CotechVacarm;
-use App\Entity\TypeMateriel;
-use App\Entity\Petitmateriel;
-use App\Entity\SousCategorie;
 use App\Entity\CotechVacarmMateriel;
-use Symfony\Component\HttpFoundation\Response;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
-use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
+use App\Entity\Ecran;
+use App\Entity\Formulaire;
+use App\Entity\Materiel;
+use App\Entity\Ordinateur;
+use App\Entity\Os;
+use App\Entity\Petitmateriel;
+use App\Entity\Poles;
+use App\Entity\Processus;
+use App\Entity\Services;
+use App\Entity\SousCategorie;
+use App\Entity\TaillePouce;
+use App\Entity\TypeMateriel;
+use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
+use Symfony\Component\HttpFoundation\Response;
 
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class AdministrationController extends AbstractDashboardController
@@ -65,6 +66,7 @@ class AdministrationController extends AbstractDashboardController
             MenuItem::linkToDashboard('Tableau de bord', 'fa fa-home'),
             MenuItem::section('Organisation'),
             MenuItem::linkToRoute('Formulaire Agile', 'fa fa-user', 'formulaire_agile'),
+            MenuItem::linkToCrud('Formulaires', 'fa-solid fa-file-pen', Formulaire::class),
             // MenuItem::linkToRoute('Planning hebdomadaire', 'fa fa-calendar-week', 'admin_planning'),
             MenuItem::linkToRoute('Planning par personne', 'fa fa-user', 'admin_planning_grille'),
             // MenuItem::linkToRoute('📊 Planning par pôle', 'fa fa-building', 'admin_planning_recap_poles'),

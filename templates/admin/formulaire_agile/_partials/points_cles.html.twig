@@ -1,0 +1,56 @@
+{% set colors = ['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#14b8a6'] %}
+
+{% for pole in poles %}
+	{% set color = colors[loop.index0 % colors|length] %}
+
+	<div class="col-lg-3 col-md-4 col-sm-6">
+		<div class="pole-card " style="border-left:6px solid {{ color }};" data-pole-id="{{ pole.id }}">
+			<div class="pole-header">
+				<div>
+					<div class="pole-name">{{ pole.nom }}</div>
+					<div class="pole-meta">
+						Resp.:
+						{{ pole.responsable ? pole.responsable.nom ~ ' ' ~
+											pole.responsable.prenom : '—' }}
+						·
+						{{ pole.personnel|length }}
+						pers.·
+						<span class="points-count">1</span>
+						points clés
+					</div>
+				</div>
+				<div class="toggle-indicator">▸</div>
+			</div>
+
+			<div class="pole-body p-2">
+
+				<div class="points-cles-card">
+					<div class="d-flex justify-content-between align-items-center mb-2">
+						<div class="section-title">Points clés</div>
+						<button type="button" class="btn-word btnAddPointCle" style="background-color: {{ color }};border:none;color:white;" data-pole-id="{{ pole.id }}">+ Point clé</button>
+					</div>
+
+					<div class="pointsClesBody" data-pole-id="{{ pole.id }}">
+						<div class="point-cle-row" data-index="0">
+							<div class="input-group mb-2">
+								<input type="text" class="form-control" name="pointsClesParPole[{{ pole.id }}][0][texte]" placeholder="Point clé…">
+								<button type="button" class="btn btn-outline-danger btnRemovePointCle">✕</button>
+							</div>
+						</div>
+					</div>
+
+					<template id="tpl-point-cle-{{ pole.id }}">
+						<div class="point-cle-row" data-index="__i__">
+							<div class="input-group mb-2">
+								<input type="text" class="form-control" name="pointsClesParPole[{{ pole.id }}][__i__][texte]" placeholder="Point clé…">
+								<button type="button" class="btn btn-outline-danger btnRemovePointCle">✕</button>
+							</div>
+						</div>
+					</template>
+
+				</div>
+
+			</div>
+		</div>
+	</div>
+{% endfor %}

@@ -1,0 +1,257 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% set formulaire = entity.instance %}
+{% set colors = ['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#14b8a6'] %}
+
+{% block page_title %}Formulaire #{{ formulaire.id }}
+{% endblock %}
+{% block content_title %}Formulaire du
+	{{ formulaire.dateJour|date('d/m/Y') }}
+{% endblock %}
+
+{% block page_actions %}
+	<a class="btn btn-secondary" href="/admin/formulaire">
+		← Retour à la liste
+	</a>
+{% endblock %}
+
+{% block main %}
+
+	<style>
+		.word-card {
+			border: 1px solid #e7e7e7;
+			border-radius: 10px;
+			background: #fff;
+			margin-bottom: 14px;
+		}
+		.word-card-title {
+			padding: 10px 12px;
+			font-weight: 600;
+			background: #fafafa;
+			border-bottom: 1px solid #ececec;
+			border-radius: 10px 10px 0 0;
+			font-size: 13px;
+			text-transform: uppercase;
+			letter-spacing: 0.2px;
+		}
+		.word-card-body {
+			padding: 12px;
+		}
+		.pole-card {
+			border-radius: 14px;
+			border: 1px solid #e5e7eb;
+			margin-bottom: 12px;
+			overflow: hidden;
+		}
+		.pole-header {
+			padding: 12px 14px;
+			background: #f9fafb;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+		.pole-name {
+			font-weight: 600;
+			font-family: 'Poppins', sans-serif;
+			font-size: 0.9rem;
+			width: 200px;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+		.pole-meta {
+			font-size: 0.75rem;
+			color: #6b7280;
+		}
+		.box {
+			background: #f9fafb;
+			border: 1px dashed #e5e7eb;
+			border-radius: 10px;
+			padding: 10px;
+		}
+		.tache-card {
+			background: #fff;
+			border-radius: 12px;
+			border: 1px solid #e5e7eb;
+			padding: 10px;
+			margin-bottom: 8px;
+		}
+	</style>
+
+	<div class="word-card">
+		<div class="word-card-title">Infos réunion</div>
+		<div class="word-card-body">
+			<div class="row g-3">
+				<div class="col-md-3">
+					<strong>Date :</strong>
+					{{ formulaire.dateJour|date('d/m/Y') }}</div>
+				<div class="col-md-3">
+					<strong>Animateur :</strong>
+					{{ formulaire.animateur }}</div>
+				<div class="col-md-3">
+					<strong>Réunion tenue :</strong>
+					{{ formulaire.reunionTenue ? 'Oui' : 'Non' }}</div>
+				<div class="col-md-12">
+					<strong>Présents :</strong>
+					{% for u in formulaire.presents %}
+						{% set prenomI = u.prenom|trim|slice(0,1)|upper %}
+						{% set nomI = '' %}
+						{% for part in u.nom|trim|split(' ') %}
+							{% if part|trim != '' %}
+								{% set nomI = nomI ~ part|trim|slice(0,1)|upper %}
+							{% endif %}
+						{% endfor %}
+						<span class="badge bg-info">{{ prenomI }}{{ nomI }}</span>
+					{% else %}
+						<span class="text-muted">—</span>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="word-card">
+		<div class="word-card-title">Points clés par pôle</div>
+		<div class="word-card-body">
+			<div class="row g-3">
+				{% for pole in poles %}
+					{% set color = colors[loop.index0 % colors|length] %}
+					{% set points = [] %}
+
+					{% for pc in formulaire.pointsCles %}
+						{% if pc.pole and pc.pole.id == pole.id %}
+							{% set points = points|merge([pc]) %}
+						{% endif %}
+					{% endfor %}
+
+					<div class="col-xl-3 col-lg-4 col-md-6">
+						<div class="pole-card" style="border-left:6px solid {{ color }};">
+							<div class="pole-header">
+								<div>
+									<div class="pole-name">{{ pole.nom }}</div>
+									<div class="pole-meta">
+										Responsable :
+										{{ pole.responsable ? pole.responsable.nom ~ ' ' ~ pole.responsable.prenom : '—' }}
+										·
+										{{ points|length }}
+										point{{ points|length > 1 ? 's' : '' }}
+									</div>
+								</div>
+							</div>
+
+							<div class="word-card-body">
+								<div class="box">
+									{% if points|length > 0 %}
+										<ul class="mb-0">
+											{% for pc in points %}
+												<li>{{ pc.texte }}</li>
+											{% endfor %}
+										</ul>
+									{% else %}
+										<div class="text-muted fst-italic">Rien à signaler</div>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+
+	<div class="word-card">
+		<div class="word-card-title">Tâches prioritaires</div>
+		<div class="word-card-body">
+			{% for t in formulaire.tachesPrioritaires %}
+				<div class="tache-card">
+					<div class="d-flex justify-content-between gap-2">
+						<div>
+							<strong>{{ loop.index }}.</strong>
+							{{ t.description }}</div>
+						<div class="text-muted">{{ t.delai ? t.delai|date('d/m/Y') : '—' }}</div>
+					</div>
+					<div class="text-muted" style="font-size:.85rem;margin-top:4px;">
+						Pilote :
+						{{ t.pilote ?: '—' }}
+						· Doublon :
+						{{ t.doublon ?: '—' }}
+					</div>
+				</div>
+			{% else %}
+				<div class="text-muted">Aucune tâche.</div>
+			{% endfor %}
+		</div>
+	</div>
+
+	<div class="word-card">
+		<div class="word-card-title">Partage d’information</div>
+		<div class="word-card-body">
+			<div class="row g-3">
+				{% for pole in poles %}
+					{% set color = colors[loop.index0 % colors|length] %}
+					{% set infos = [] %}
+
+					{% for pi in formulaire.partageInfos %}
+						{% if pi.pole and pi.pole.id == pole.id %}
+							{% set infos = infos|merge([pi]) %}
+						{% endif %}
+					{% endfor %}
+
+					<div class="col-xl-3 col-lg-4 col-md-6">
+
+						<div class="pole-card" style="border-left:6px solid {{ color }};">
+							<div class="pole-header">
+								<div>
+									<div class="pole-name">{{ pole.nom }}</div>
+									<div class="pole-meta">
+										{{ infos|length }}
+										info{{ infos|length > 1 ? 's' : '' }}
+									</div>
+								</div>
+							</div>
+
+							<div class="word-card-body">
+								<div class="box">
+									{% if infos|length > 0 %}
+										<ul class="mb-0">
+											{% for pi in infos %}
+												<li>
+													{{ pi.texte }}
+													{% if pi.important %}
+														<span class="badge bg-danger ms-2">Important</span>
+													{% endif %}
+													{% if pi.aRelancer %}
+														<span class="badge bg-warning text-dark ms-2">À relancer</span>
+													{% endif %}
+												</li>
+											{% endfor %}
+										</ul>
+									{% else %}
+										<div class="text-muted fst-italic">Rien à signaler</div>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+
+	<div class="word-card">
+		<div class="word-card-title">Prochaine réunion</div>
+		<div class="word-card-body">
+			<div class="row g-2">
+				<div class="col-md-6">
+					<strong>Date/heure :</strong>
+					{{ formulaire.prochaineReunionAt ? formulaire.prochaineReunionAt|date('d/m/Y H:i') : '—' }}
+				</div>
+				<div class="col-md-6">
+					<strong>Animateur :</strong>
+					{{ formulaire.prochainAnimateur ?: '—' }}
+				</div>
+			</div>
+		</div>
+	</div>
+
+{% endblock %}

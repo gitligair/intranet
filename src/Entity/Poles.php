@@ -51,10 +51,24 @@ class Poles
     #[ORM\OneToMany(targetEntity: Tache::class, mappedBy: 'pole')]
     private Collection $taches;
 
+    /**
+     * @var Collection<int, FormPointscles>
+     */
+    #[ORM\OneToMany(targetEntity: FormPointscles::class, mappedBy: 'pole')]
+    private Collection $formPointscles;
+
+    /**
+     * @var Collection<int, FormPartageinfos>
+     */
+    #[ORM\OneToMany(targetEntity: FormPartageinfos::class, mappedBy: 'pole')]
+    private Collection $formPartageinfos;
+
     public function __construct()
     {
         $this->personnel = new ArrayCollection();
         $this->taches = new ArrayCollection();
+        $this->formPointscles = new ArrayCollection();
+        $this->formPartageinfos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -198,6 +212,66 @@ class Poles
             // set the owning side to null (unless already changed)
             if ($tach->getPole() === $this) {
                 $tach->setPole(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FormPointscles>
+     */
+    public function getFormPointscles(): Collection
+    {
+        return $this->formPointscles;
+    }
+
+    public function addFormPointscle(FormPointscles $formPointscle): static
+    {
+        if (!$this->formPointscles->contains($formPointscle)) {
+            $this->formPointscles->add($formPointscle);
+            $formPointscle->setPole($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFormPointscle(FormPointscles $formPointscle): static
+    {
+        if ($this->formPointscles->removeElement($formPointscle)) {
+            // set the owning side to null (unless already changed)
+            if ($formPointscle->getPole() === $this) {
+                $formPointscle->setPole(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FormPartageinfos>
+     */
+    public function getFormPartageinfos(): Collection
+    {
+        return $this->formPartageinfos;
+    }
+
+    public function addFormPartageinfo(FormPartageinfos $formPartageinfo): static
+    {
+        if (!$this->formPartageinfos->contains($formPartageinfo)) {
+            $this->formPartageinfos->add($formPartageinfo);
+            $formPartageinfo->setPole($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFormPartageinfo(FormPartageinfos $formPartageinfo): static
+    {
+        if ($this->formPartageinfos->removeElement($formPartageinfo)) {
+            // set the owning side to null (unless already changed)
+            if ($formPartageinfo->getPole() === $this) {
+                $formPartageinfo->setPole(null);
             }
         }
 
